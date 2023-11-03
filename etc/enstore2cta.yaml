@@ -17,3 +17,8 @@ library_map:
   TFF2-LTO9: TS4500G1
   TFF2-LTO9M: TS4500G1
   TFF2-LTO9T: TS4500G1
+# Enstore to CTA media_type map.
+media_type_map:
+  LTO8: LTO8
+  M8: LTO7M
+  LTO9: LTO9
