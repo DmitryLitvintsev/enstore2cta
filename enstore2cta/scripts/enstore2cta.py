@@ -82,6 +82,7 @@ from file f inner join volume v
         v.label = %s and
         v.active_files > 0 and
         f.deleted = 'n'
+        order by f.location_cookie
 """
 
 SELECT_ENSTORE_FILES_FOR_VOLUME_WITH_COPY = """
@@ -101,7 +102,9 @@ left outer join volume v1 on v1.id = f1.volume
         v.system_inhibit_0 = 'none' and
         v.label = %s and
         v.active_files > 0 and
+        (f1.deleted is null or f1.deleted = 'n') and
         f.deleted = 'n'
+        order by f.pnfs_id
 """
 
 # Enstore to CTA media_type mape, entries
