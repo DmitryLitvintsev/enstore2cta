@@ -25,7 +25,6 @@ except ModuleNotFoundError:
 
 
 DISK_INSTANCE_NAME = "eosdev"
-LOGICAL_LIBRARY_NAME = "TS4500G1"
 TAPE_POOL_NAME = "ctasystest"
 
 CONFIG_FILE = os.getenv("MIGRATION_CONFIG")
@@ -452,8 +451,8 @@ def insert_cta_tape(connection, enstore_volume, config):
                  INSERT_CTA_TAPE,(
                      enstore_volume["label"][:6],
                      media_type_map[enstore_volume["media_type"]],
-                     config.get("logical_library_name"), #FIXME - need to map Enstore LMs to CTA logical libraries
-                     config.get("tape_pool_name"),
+                     config.get("library_map")[enstore_volume["library"]],
+                     config.get("tape_pool_name"), #FIXME
                      enstore_volume["active_bytes"],
                      extract_file_number(enstore_volume["eod_cookie"]) - 1,
                      enstore_volume["active_files"],
