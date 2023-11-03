@@ -89,6 +89,7 @@ select f.*,
        v.storage_group||'.'||v.file_family||'@cta' as storage_class,
        f1.bfid as copy_bfid,
        f1.location_cookie as copy_location_cookie,
+       f1.deleted as copy_deleted,
        v1.*
 from file f
 inner join volume v on v.id = f.volume
@@ -575,10 +576,11 @@ class Worker(multiprocessing.Process):
                                                 (label, f["label"], str(e)))
                                     pass
                             try:
-                                insert_cta_tape_file_copy(cta_db,
-                                                          archive_file_id,
-                                                          f,
-                                                          self.config)
+                                if f["copy_deleted"] == "n":
+                                    insert_cta_tape_file_copy(cta_db,
+                                                              archive_file_id,
+                                                              f,
+                                                              self.config)
                             except Exception as e:
                                 print_error("%s Failed to insert tape_file, %s"
                                             " %s %s %s, skipping %s" %
