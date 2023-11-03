@@ -107,8 +107,8 @@ left outer join volume v1 on v1.id = f1.volume
         order by f.pnfs_id
 """
 
-# Enstore to CTA media_type mape, entries
-# in CTA are expected to exist
+# Enstore to CTA media_type map.
+# Entries in CTA are expected to exist.
 media_type_map = {
     "LTO8" : "LTO8",
     "M8" : "LTO7M",
