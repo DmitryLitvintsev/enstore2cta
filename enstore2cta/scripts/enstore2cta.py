@@ -488,8 +488,7 @@ insert into storage_class (
 )
 """
 
-def insert_storage_class(cta_db, storage_class, number_of_copies=1):
-    vo = storage_class.split(".")[0]
+def insert_storage_class(cta_db, storage_class, vo, number_of_copies=1):
     res = insert(cta_db,
                  INSERT_STORAGE_CLASS,
                  (storage_class+"@cta",
@@ -513,7 +512,8 @@ def insert_storage_classes(enstore_db, cta_db):
     for row in multiple_copy_storge_classes:
         storage_class = row["storage_class"]
         storage_class = storage_class.rstrip("_copy_1")
-        insert_storage_class(cta_db, storage_class, number_of_copies)
+        vo = storage_class.split(".")[0]
+        insert_storage_class(cta_db, storage_class, vo, number_of_copies)
         added_classes[storage_class] = number_of_copies
 
     storage_classes = select(enstore_db,
@@ -523,9 +523,11 @@ def insert_storage_classes(enstore_db, cta_db):
     for row in storage_classes:
         storage_class = row["storage_class"]
         if storage_class not in added_classes:
-            insert_storage_class(cta_db, storage_class, number_of_copies)
+            vo = storage_class.split(".")[0]
+            insert_storage_class(cta_db, storage_class, vo, number_of_copies)
             added_classes[storage_class] = number_of_copies
     return added_classes
+
 
 INSERT_TAPE_POOL = """
 insert into tape_pool (
@@ -787,12 +789,18 @@ def insert_cta_tape(connection, enstore_volume, config):
     vo = enstore_volume["storage_group"]
     library = enstore_volume["library"]
     tape_pool_name = "%s:%s" % (library, vo,) #FIXME
+    logical_library_name = enstore_volume["library"]
+    if config.get("library_map"):
+        try:
+            logical_library_name = config.get("library_map")[logical_library_name]
+        except KeyError:
+            raise
     res = insert(connection,
                  INSERT_CTA_TAPE,(
                      enstore_volume["label"][:6],
                      config.get("media_type_map")[enstore_volume["media_type"]],
-                     enstore_volume["library"],
-                     enstore_volume["storage_group"], #config.get("tape_pool_name"), #FIXME
+                     logical_library_name,
+                     config.get("tape_pool_name",enstore_volume["storage_group"]),  #FIXME
                      enstore_volume["active_bytes"],
                      extract_file_number(enstore_volume["eod_cookie"]) - 1,
                      enstore_volume["active_files"],
@@ -910,6 +918,9 @@ class Worker(multiprocessing.Process):
                 enstore_volume = enstore_volumes[0]
                 try:
                     res = insert_cta_tape(cta_db, enstore_volume, self.config)
+                except KeyError:
+                    print_error("Failed to insert tape label %s because mapping for libary %s does not exist" % (enstore_volume["label"], enstore_volume["library"],))
+                    continue
                 except Exception as e:
                     print_error("%s already exist, skipping, %s " %
                                 (enstore_volume["label"], str(e)))
@@ -1167,21 +1178,25 @@ def main():
         help="skip filling chimera locations (good for testing)",
         action="store_true")
 
+    parser.add_argument(
+        "--add",
+        help="add volume(s) to existing system, do not create vos, pools, archive_routes etc. These need to pre-exist in CTA db",
+        action="store_true")
+
+    parser.add_argument(
+        "--storage_class",
+        help="Add storage class corresponding to volume. Needed when adding single volume to existing system using --add option")
+
+    parser.add_argument(
+        "--vo",
+        help="vo corresponding to storage_class. Needed when adding single volume to existing system using --add option")
     args = parser.parse_args()
-
-    if args.label and args.all:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
-
-    if not args.label and not args.all:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
 
     configuration = None
     try:
         mode = os.stat(CONFIG_FILE).st_mode
         if mode != 33152:
-            print_error("Access to config file file %s is too permissive" %
+            print_error("Access to config file file %s is too permissive, do chmod 0600" %
                         (CONFIG_FILE,))
             sys.exit(1)
         with open(CONFIG_FILE, "r") as f:
@@ -1196,7 +1211,23 @@ def main():
         sys.exit(1)
 
     configuration["skip_locations"] = args.skip_locations
-    print (configuration)
+    #print (configuration)
+
+    if args.label and args.all:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+    if not args.label and not args.all:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+    if args.add:
+        if args.storage_class and args.vo:
+            cta_db = create_connection(configuration.get("cta_db"))
+            res = insert_storage_class(cta_db,
+                                       args.storage_class,
+                                       args.vo,
+                                       1)
 
     labels = None
     if args.label:
@@ -1210,21 +1241,27 @@ def main():
         cursor.close()
         enstore_db.close()
 
+
     if not labels:
          print_error("**** No labels found, quitting ***")
          sys.exit(1)
 
-    enstore_db = create_connection(configuration.get("enstore_db"))
-    cta_db = create_connection(configuration.get("cta_db"))
-    insert_cta_media_types(cta_db)
-    insert_disk_instance(cta_db, disk_instance_name=configuration.get("disk_instance_name"))
-    vos = insert_vos(enstore_db, cta_db, disk_instance_name=configuration.get("disk_instance_name"))
-    libraries = insert_logical_libraries(enstore_db, cta_db)
-    storage_classes = insert_storage_classes(enstore_db, cta_db)
-    tape_pools = insert_tape_pools(cta_db, vos)
-    insert_archive_routes(cta_db, storage_classes, tape_pools)
-    enstore_db.close()
-    cta_db.close()
+    if not args.add:
+        enstore_db = create_connection(configuration.get("enstore_db"))
+        cta_db = create_connection(configuration.get("cta_db"))
+        try:
+            insert_cta_media_types(cta_db)
+        except:
+            pass
+        insert_disk_instance(cta_db, disk_instance_name=configuration.get("disk_instance_name"))
+        vos = insert_vos(enstore_db, cta_db, disk_instance_name=configuration.get("disk_instance_name"))
+        libraries = insert_logical_libraries(enstore_db, cta_db)
+        storage_classes = insert_storage_classes(enstore_db, cta_db)
+        tape_pools = insert_tape_pools(cta_db, vos)
+        insert_archive_routes(cta_db, storage_classes, tape_pools)
+        enstore_db.close()
+        cta_db.close()
+
 
     print_message("**** Start processing %d  labels ****" % (len(labels), ))
     t0 = time.time()
