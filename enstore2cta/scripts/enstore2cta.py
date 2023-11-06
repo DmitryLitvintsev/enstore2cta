@@ -848,12 +848,34 @@ insert into t_locationinfo (inumber, itype, ipriority, ictime, iatime, istate, i
    %s)
 """
 
-
 def insert_chimera_location(connection, enstore_file, location):
     res = insert(connection,
                  INSERT_CHIMERA_LOCATION,
                  (enstore_file["pnfs_id"],
                   location,))
+    return res
+
+
+UPDATE_COPY_COUNTS = """
+update tape
+   set nb_copy_nb_1 = t.nb_copy_nb_1,
+       copy_nb_1_in_bytes = t.copy_nb_1_in_bytes,
+       nb_copy_nb_gt_1 = t.nb_copy_nb_gt_1,
+       copy_nb_gt_1_in_bytes = t.copy_nb_gt_1_in_bytes
+from
+   (select tf.vid as vid,
+      sum(case when tf.copy_nb > 1 then af.size_in_bytes else 0 end) as copy_nb_gt_1_in_bytes,
+      sum(case when tf.copy_nb = 1 then af.size_in_bytes else 0 end) as copy_nb_1_in_bytes,
+      sum(case when tf.copy_nb > 1 then 1 else 0 end) as nb_copy_nb_gt_1,
+      sum(case when tf.copy_nb = 1 then 1 else 0 end) as nb_copy_nb_1
+    from archive_file af
+       inner join tape_file tf on tf.archive_file_id = af.archive_file_id
+    group by tf.vid) as t
+    where t.vid = tape.vid
+"""
+
+def update_cta_copy_counts(cta_db):
+    res = update(cta_db, UPDATE_COPY_COUNTS)
     return res
 
 
@@ -964,7 +986,7 @@ class Worker(multiprocessing.Process):
 
 
 
-def update(con, sql, pars):
+def update(con, sql, pars=None):
     """
     Update database record
 
@@ -983,7 +1005,7 @@ def update(con, sql, pars):
     return insert(con, sql, pars)
 
 
-def insert(con, sql, pars):
+def insert(con, sql, pars=None):
     """
     Insert database record
 
@@ -1002,7 +1024,10 @@ def insert(con, sql, pars):
     cursor = None
     try:
         cursor = con.cursor()
-        res = cursor.execute(sql, pars)
+        if pars:
+            res = cursor.execute(sql, pars)
+        else:
+            res = cursor.execute(sql)
         con.commit()
         return res
     except Exception:
@@ -1015,7 +1040,7 @@ def insert(con, sql, pars):
             except Exception:
                 pass
 
-def insert_returning(con, sql, pars):
+def insert_returning(con, sql, pars=None):
     """
     Insert database record
 
@@ -1035,7 +1060,10 @@ def insert_returning(con, sql, pars):
     try:
         sql +=  "returning *"
         cursor = con.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql, pars)
+        if pars:
+            cursor.execute(sql, pars)
+        else:
+            cursor.execute(sql)
         res = cursor.fetchone()
         con.commit()
         return res
@@ -1210,6 +1238,12 @@ def main():
         queue.put(None)
 
     map(lambda x: x.join(), workers);
+
+    print_message("Finished file migration, bootstrapping tapes copies counts")
+
+    cta_db = create_connection(configuration.get("cta_db"))
+    res = update_cta_copy_counts(cta_db)
+    cta_db.close()
 
 
     print_message("**** FINISH ****")

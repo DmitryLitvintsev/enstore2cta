@@ -47,8 +47,3 @@ media_type_map:
   LTO9: LTO9
 
 ```
-
-Limitation
-----------
-
-* Counts of file copies on tape volumes are not updated. This can be done by a single update query after script has completed. Not relevant for sites utilizing multiple file copies.
