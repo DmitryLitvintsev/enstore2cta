@@ -112,7 +112,7 @@ insert into media_type (
   %s,
   %s,
   %s
-)                                                                                                                                                                                           
+)
 """
 
 def insert_cta_media_types(cta_db):
@@ -580,7 +580,7 @@ def insert_tape_pools(cta_db, vos):
                                 int(time.time())))
         tape_pools[vo] = res
     return tape_pools
-                                   
+
 INSERT_ARCHIVE_ROUTE = """
 insert into archive_route (
   storage_class_id,
@@ -624,8 +624,8 @@ def insert_archive_routes(cta_db, storage_classes, tape_pools):
                       getpass.getuser(),
                       HOSTNAME,
                       int(time.time())))
-        
-                         
+
+
 INSERT_ARCHIVE_FILE = """
 insert into archive_file (
   archive_file_id,
@@ -940,13 +940,13 @@ class Worker(multiprocessing.Process):
                         location = "cta://cta/%s?archiveid=%d" %\
                                    (f["pnfs_id"],
                                    archive_file_id,)
-#                        try:
-#                            res = insert_chimera_location(chimera_db, f, location)
-#                        except Exception as e:
-#                             print_error("%s %s failed to insert location %s, %s" %
-#                                         (label, f["pnfs_id"], location, str(e),))
-#                             pass
-#
+                        try:
+                            res = insert_chimera_location(chimera_db, f, location)
+                        except Exception as e:
+                             print_error("%s %s failed to insert location into chimera DB %s, %s" %
+                                         (label, f["pnfs_id"], location, str(e),))
+                             pass
+
                     except Exception as e:
                         print_error("%s, multiple pnfsid, skipping %s, %s" %
                                     (enstore_volume["label"], f["pnfs_id"], str(e)))
