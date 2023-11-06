@@ -959,15 +959,16 @@ class Worker(multiprocessing.Process):
                                              str(e)))
                                 pass
 
-                        location = "cta://cta/%s?archiveid=%d" %\
-                                   (f["pnfs_id"],
-                                   archive_file_id,)
-                        try:
-                            res = insert_chimera_location(chimera_db, f, location)
-                        except Exception as e:
-                             print_error("%s %s failed to insert location into chimera DB %s, %s" %
-                                         (label, f["pnfs_id"], location, str(e),))
-                             pass
+                        if not self.config["skip_locations"]:
+
+                            location = "cta://cta/%s?archiveid=%d" % (f["pnfs_id"],
+                                                                      archive_file_id,)
+                            try:
+                                res = insert_chimera_location(chimera_db, f, location)
+                            except Exception as e:
+                                print_error("%s %s failed to insert location into chimera DB %s, %s" %
+                                            (label, f["pnfs_id"], location, str(e),))
+                                pass
 
                     except Exception as e:
                         print_error("%s, multiple pnfsid, skipping %s, %s" %
@@ -1161,6 +1162,11 @@ def main():
         help="do all labels",
         action="store_true")
 
+    parser.add_argument(
+        "--skip_locations",
+        help="do all labels",
+        action="store_true")
+
     args = parser.parse_args()
 
     if args.label and args.all:
@@ -1189,6 +1195,7 @@ def main():
         print_error("Failed to load configuration %s" % (CONFIG_FILE,))
         sys.exit(1)
 
+    configuration["skip_locations"] = args.skip_locations
     print (configuration)
 
     labels = None
@@ -1245,9 +1252,9 @@ def main():
     res = update_cta_copy_counts(cta_db)
     cta_db.close()
 
-
     print_message("**** FINISH ****")
     print_message("Took %d seconds" % (int(time.time()-t0+0.5),))
+
 
 if __name__ == "__main__":
     main()
