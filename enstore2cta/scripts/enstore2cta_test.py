@@ -830,8 +830,8 @@ def main():
     for i in range(cpu_count):
         queue.put(None)
 
-    map(lambda x: x.join(), workers);
-
+    for worker in workers:
+        worker.join()
 
     print_message("**** FINISH ****")
     print_message("Took %d seconds" % (int(time.time()-t0+0.5),))

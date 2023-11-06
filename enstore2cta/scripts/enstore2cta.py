@@ -898,10 +898,10 @@ class Worker(multiprocessing.Process):
 
     def run(self):
         try:
-            # enstroe db
+            # enstore db
             enstore_db = create_connection(self.config.get("enstore_db"))
             # cta db
-            cta_db =  create_connection(self.config.get("cta_db"))
+            cta_db = create_connection(self.config.get("cta_db"))
             # chimera_db
             chimera_db = create_connection(self.config.get("chimera_db"))
 
@@ -1221,6 +1221,28 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
 
+    cta_db, enstore_db, chimera_db = None, None, None
+
+    try:
+        cta_db = create_connection(configuration.get("cta_db"))
+    except:
+        print_error("Failed to initialize connection to cta_db, quitting")
+        sys.exit(1)
+
+    try:
+        enstore_db = create_connection(configuration.get("enstore_db"))
+    except:
+        print_error("Failed to initialize connection to enstore_db, quitting")
+        sys.exit(1)
+
+    try:
+        chimera_db = create_connection(configuration.get("chimera_db"))
+        chimera_db.close()
+    except:
+        print_error("Failed to initialize connection to chimera_db, quitting")
+        sys.exit(1)
+
+
     if args.add:
         if args.storage_class and args.vo:
             cta_db = create_connection(configuration.get("cta_db"))
@@ -1238,17 +1260,14 @@ def main():
         cursor = enstore_db.cursor()
         cursor.execute(SELECT_ALL_ENSTORE_VOLUMES)
         labels = [i[0] for i in cursor.fetchall()]
-        cursor.close()
-        enstore_db.close()
-
+        if cursor:
+            cursor.close()
 
     if not labels:
          print_error("**** No labels found, quitting ***")
          sys.exit(1)
 
     if not args.add:
-        enstore_db = create_connection(configuration.get("enstore_db"))
-        cta_db = create_connection(configuration.get("cta_db"))
         try:
             insert_cta_media_types(cta_db)
         except:
@@ -1269,6 +1288,7 @@ def main():
     queue = multiprocessing.Queue(10000)
     workers = []
     cpu_count = multiprocessing.cpu_count()
+    cpu_count = 2
 
     for i in range(cpu_count):
         worker = Worker(queue, configuration)
@@ -1281,13 +1301,20 @@ def main():
     for i in range(cpu_count):
         queue.put(None)
 
-    map(lambda x: x.join(), workers);
+    for worker in workers:
+        worker.join()
 
     print_message("Finished file migration, bootstrapping tapes copies counts")
 
-    cta_db = create_connection(configuration.get("cta_db"))
-    res = update_cta_copy_counts(cta_db)
-    cta_db.close()
+    try:
+        cta_db = create_connection(configuration.get("cta_db"))
+        res = update_cta_copy_counts(cta_db)
+    except:
+        print_error("Failed to connect to cta_db, quitting")
+        sys.exit(1)
+    finally:
+        if cta_db:
+            cta_db.close()
 
     print_message("**** FINISH ****")
     print_message("Took %d seconds" % (int(time.time()-t0+0.5),))
