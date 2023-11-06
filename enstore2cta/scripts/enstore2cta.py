@@ -1164,7 +1164,7 @@ def main():
 
     parser.add_argument(
         "--skip_locations",
-        help="do all labels",
+        help="skip filling chimera locations (good for testing)",
         action="store_true")
 
     args = parser.parse_args()

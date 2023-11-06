@@ -22,9 +22,10 @@ it is not defined, it looks for file enstore2cta.yaml in current directory.
 Script will quit if configuration YAML is not found.
 
 optional arguments:
-  -h, --help     show this help message and exit
-  --label LABEL  comma separated list of labels
-  --all          do all labels
+  -h, --help        show this help message and exit
+  --label LABEL     comma separated list of labels
+  --all             do all labels
+  --skip_locations  skip filling chimera locations (good for testing)
 ```
 
 The script can work with individual label(s) passed as comma separated values to `--label` option. Or it can be invoked
