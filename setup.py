@@ -15,5 +15,7 @@ setup(
     author="Dmitry Litvintsev",
     url="https://github.com/DmitryLitvintsev/enstore2cta",
     license=license,
-    packages=find_packages(exclude=('tests', 'docs'))
+    #packages=["enstore2cta",],
+    install_requires = ["psycopg2",],
+    scripts=["enstore2cta/scripts/enstore2cta.py",],
     )
