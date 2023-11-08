@@ -13,8 +13,8 @@ To run the script a config file ``enstore2cta.yaml`` *must* exist in
 the current directory or be pointed at by MIGRATION_CONFIG environment variable.
 Look for example in enstore2cta/etc. It must have "0600" permission
 
+::
 
-.. code-block::
 $ python enstore2cta.py
 usage: enstore2cta.py [-h] [--label LABEL] [--all] [--skip_locations] [--add]
                       [--storage_class STORAGE_CLASS] [--vo VO]
