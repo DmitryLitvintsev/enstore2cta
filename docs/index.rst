@@ -51,6 +51,14 @@ dCache locatons
 
    dcache_locations.rst
 
+Small Files
+===========
+
+.. toctree::
+   :maxdepth: 1
+
+   dcache_sfa.rst
+
 dCache Setup
 ============
 
