@@ -2,16 +2,16 @@ enstore2cta - Enstore to CTA migration script
 =============================================
 
 The script ``enstore2cta.py``, located in ``enstore2cta/scripts``, implements
-database migration from Enstore DB tro CTA DB. Both databases must be
+database migration from Enstore DB to CTA DB. Both databases must be
 `PostgreSQL` databases. The script has various steering options (see below).
-It spawns multuiple processes, each process processing a unique Enstore volume.
+It spawns multiple processes, each process processing a unique Enstore volume.
 
 
 Requirements
 ------------
 
 
-The scrit works both with python2 and python3 and requires ``psycopg2`` module be installed (using ``pip`` or ``yum install python-psycopg2``).
+The script works both with python2 and python3 and requires ``psycopg2`` module be installed (using ``pip`` or ``yum install python-psycopg2``).
 
 
 Invocation
@@ -49,7 +49,7 @@ Look for example in ``enstore2cta/etc``. It must have "0600" permission (to prot
                          single volume to existing system using --add option
                          (default: None)
    --cpu_count CPU_COUNT
-                         override cpu count - number of simulateously processed
+                         override cpu count - number of simultaneously processed
                          labels (default: 8)
                          single volume to existing system using --add option
 
@@ -58,5 +58,5 @@ Look for example in ``enstore2cta/etc``. It must have "0600" permission (to prot
 
 The script can work with individual label(s) passed as comma separated values to ``--label`` option. Or it can be invoked with ``--all`` switch to migrate all labels. The migration is done by label.
 
-Additionally, on an existing CTA systenm one can use
+Additionally, on an existing CTA system one can use
 ``--add`` option to add a volume also specifying its ``--storage_class`` (e.g. "cms.foo") and ``--vo`` (e.g. "cms").

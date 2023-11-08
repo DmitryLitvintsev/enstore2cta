@@ -2,7 +2,7 @@ SFA files
 =========
 
 One of the issues that has been identified - CTA does not have
-functinality corresponding to Enstore SFA (Small File Aggregation).
+functionality corresponding to Enstore SFA (Small File Aggregation).
 In the nutshell the SFA system is as extension of Enstore system that
 manages  intermediate disk storage on the side (intermediate between
 dCache and Enstore). Depending on policies based on ``file_family``,
@@ -24,6 +24,6 @@ We need to translate::
     -> dcache://dcache/?store=vo&group=file_family&bfid={child_pnfsid}:package_pnfsid
 
 I.e. the child/package relation exists as location in ``t_locationinfo`` Chimera
-table. As long as these locations exist dCache can read thise files from CTA using an hsm script. T.e. SAPPHIRE system is not need for reading of SFA files.
+table. As long as these locations exist dCache can read these files from CTA using an hsm script. T.e. SAPPHIRE system is not need for reading of SFA files.
 
 This can be populated out of band.

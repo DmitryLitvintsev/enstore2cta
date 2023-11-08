@@ -1197,7 +1197,7 @@ def main():
         action  = "store",
         type = int,
         default =  multiprocessing.cpu_count(),
-        help="override cpu count - number of simulateously processed labels")
+        help="override cpu count - number of simultaneously processed labels")
 
 
     args = parser.parse_args()

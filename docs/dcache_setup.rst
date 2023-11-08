@@ -5,7 +5,7 @@ dCache setup with CTA
 Pool
 ----
 
-Deploy dcache-cta driver on pool node::
+Deploy dCache-CTA driver on pool node::
 
  wget https://download.dcache.org/nexus/repository/dcache-cta/dcache-cta-0.8.0-1.noarch.rpm
  rpm -Uvh --force dcache-cta-0.8.0-1.noarch.rpm
@@ -15,7 +15,7 @@ Define hsm on pool::
 
  hsm create cta cta dcache-cta -cta-user=adm -cta-group=eosusers -cta-instance-name=eosdev -cta-frontend-addr=ctahost:17017 -io-port=1094
 
-Each pool on the pool node has to havea dedicated port.
+Each pool on the pool node has to have dedicated port.
 
 Define queue on pool::
 
