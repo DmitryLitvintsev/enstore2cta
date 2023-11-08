@@ -1,6 +1,23 @@
 Welcome to Enstore to CTA documentation
 =======================================
 
+enstore2cta script
+==================
+
+.. toctree::
+   :maxdepth: 1
+
+   enstore2cta_scipt.rst
+
+Configuration
+=============
+
+.. toctree::
+   :maxdepth: 1
+
+   enstore2cta_config.rst
+
+
 Enstore Schema
 ===============
 
