@@ -143,4 +143,4 @@ During migration the value of comment in ``tape.user_comment`` is assigned the v
  (2 rows)
 
 
-This is solved by simply truncating coment string to 1000 before inserting.
+This is solved by simply truncating comment string to 1000 before inserting.
