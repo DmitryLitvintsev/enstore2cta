@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('../../enstore2cta'))
 # -- Project information -----------------------------------------------------
 
 project = 'enstore2cta'
-copyright = 'Fermi Research Alliance, LLC'
 author = 'Dmitry Litvintsev'
+copyright = author
 release = '0.1.0'
 
 
