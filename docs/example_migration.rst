@@ -9,6 +9,7 @@ On storagedev201, run the following::
  python3 enstore2cta.py --label VR1871M8 --add > try.log 2>&1
 
 Result::
+
  # tail try.log
  2023-11-06 12:41:01 INFO : **** Start processing 1  labels ****
  2023-11-06 12:41:01 INFO : Finished file migration, bootstrapping tapes copies counts
@@ -21,6 +22,7 @@ Result::
 not the way I expected (fixed later). Took about 2 minutes!!
 
 Check that the file from that tape can be read by dCache::
+
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore >  rh restore 000003042F3D23AF47BFB08A496A256A861C
  Fetch request queued.
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore > rep ls  000003042F3D23AF47BFB08A496A256A861C
@@ -30,6 +32,7 @@ Observed CTA reading volume ``VR1871``, and after a while::
 
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore > rep ls  000003042F3D23AF47BFB08A496A256A861C
  000003042F3D23AF47BFB08A496A256A861C <C-------X--L(0)[0]> 2097152000 si={ssa_test.diskSF1T_in_LTO8G1T}
+
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore > pf 000003042F3D23AF47BFB08A496A256A861C
  /pnfs/fs/usr/ssa_test/CTA/large/7/dc0796f8-3b21-400b-8d9f-c066a80aca5c.data
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore >
@@ -51,11 +54,13 @@ CMS
 ---
 
 ::
+
  nohup  python enstore2cta_cms.py --all --skip_locations > cms.log 2>&1&
 
 The ``--skip_locations`` was used because I did not have CMS chimera carried over.
 
 Result: ::
+
  # tail cms.log
  2023-11-07 23:09:36 INFO : VRA931M8 Done, 3115 files
  2023-11-07 23:09:36 INFO : VRA930M8 Done, 3159 files
@@ -69,6 +74,7 @@ Result: ::
  2023-11-07 23:10:44 INFO : Took 2210 seconds
 
 On db end: ::
+
  cta_cms=# select pg_size_pretty(pg_database_size('cta_cms'));
  pg_size_pretty
  ----------------
@@ -92,6 +98,7 @@ Public
 
 Above command does "everything" including inserting locations to chimera db.
 Results: ::
+
  # tail public.log
  2023-11-07 21:04:48 INFO : VRA788M8 Done, 14591 files
  2023-11-07 21:04:49 INFO : VRA771M8 Done, 20641 files
@@ -105,6 +112,7 @@ Results: ::
  2023-11-07 21:11:14 INFO : Took 17813 seconds
 
 On db end::
+
  cta_dev=# select count(*) from archive_file;
     count
  -----------
