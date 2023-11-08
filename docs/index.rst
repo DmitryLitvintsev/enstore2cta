@@ -43,6 +43,21 @@ Enstore to CTA Mapping
 
    enstore2cta_mapping.rst
 
+dCache locatons
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   dcache_locations.rst
+
+dCache Setup
+============
+
+.. toctree::
+   :maxdepth: 1
+
+   dcache_setup.rst
 
 Example Migration
 ================
