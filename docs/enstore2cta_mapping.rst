@@ -16,7 +16,9 @@ Enstore to CTA mapping
    * - | ``volume.storage_group``
        |  ``volume.file_family``
      - ``storage_class.storage_class_name=volume.storage_group+"."+volume.file_family+"@cta"``
-     -
+     - | This is needed so that dCache can
+       | communicate to CTA and still use ``storage_class``
+       | for data steering within dCache.
    * - ``volume.library``
      - ``logical_library_name``
      -

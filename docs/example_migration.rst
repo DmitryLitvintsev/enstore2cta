@@ -2,13 +2,13 @@ Example Migration
 =================
 
 Validation
-==========
+----------
 
-On storagedev201, run the following: ::
+On storagedev201, run the following::
 
  python3 enstore2cta.py --label VR1871M8 --add > try.log 2>&1
 
-Result: ::
+Result::
  # tail try.log
  2023-11-06 12:41:01 INFO : **** Start processing 1  labels ****
  2023-11-06 12:41:01 INFO : Finished file migration, bootstrapping tapes copies counts
@@ -20,14 +20,13 @@ Result: ::
 "Took 0 seconds" because python3 does ``map(lambda x: x.join(), processes)``
 not the way I expected (fixed later). Took about 2 minutes!!
 
-Check that the file from that tape can be read by dCache: ::
-
+Check that the file from that tape can be read by dCache::
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore >  rh restore 000003042F3D23AF47BFB08A496A256A861C
  Fetch request queued.
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore > rep ls  000003042F3D23AF47BFB08A496A256A861C
  000003042F3D23AF47BFB08A496A256A861C <---S-------L(0)[0]> 0 si={ssa_test.diskSF1T_in_LTO8G1T}
 
-Observed CTA reading volume ``VR1871``, and after a while: ::
+Observed CTA reading volume ``VR1871``, and after a while::
 
  [fndcaitb3] (rw-stkendca28a-1@rw-stkendca28a-1Domain) enstore > rep ls  000003042F3D23AF47BFB08A496A256A861C
  000003042F3D23AF47BFB08A496A256A861C <C-------X--L(0)[0]> 2097152000 si={ssa_test.diskSF1T_in_LTO8G1T}
@@ -39,7 +38,7 @@ File was staged and marked cached on pool.
 
 
 Full migration
-==============
+--------------
 
 Used fdm1903, 8 TB NVME drive. 24 cores.
 
@@ -105,7 +104,7 @@ Results: ::
  2023-11-07 21:11:14 INFO : **** FINISH ****
  2023-11-07 21:11:14 INFO : Took 17813 seconds
 
-On db end: ::
+On db end::
  cta_dev=# select count(*) from archive_file;
     count
  -----------
