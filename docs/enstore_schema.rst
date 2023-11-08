@@ -14,7 +14,7 @@ File table
 ----------
 
 Each file copy in Enstore is uniquely identified by a BFID  -  bit file id,
-which is a string obtained by adding a three letter `brand` (which is the same for all files in a given Enstore instance), the Unix epoch, multiplied by 100000 and a counter which is reserved to resolve collisions. BFID is generated in the code base and is iserted into ``file`` table where it has unique contraint. If insert file, the counter is incremented and the record insertion is tried again. And so on until it succeeds.
+which is a string obtained by adding a three letter `brand` (which is the same for all files in a given Enstore instance), the Unix epoch, multiplied by 100000 and a counter which is reserved to resolve collisions. BFID is generated in the code base and is iserted into ``file`` table where it has unique contraint. If insert fails, the counter is incremented and the record insertion is tried again. And so on until it succeeds.
 
 .. code-block:: python
 
