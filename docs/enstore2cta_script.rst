@@ -1,10 +1,17 @@
 enstore2cta - Enstore to CTA migration script
 =============================================
 
+The script ``enstore2cta.py``, located in ``enstore2cta/scripts``, implements
+database migration from Enstore DB tro CTA DB. Both databases must be
+`PostgreSQL` databases. The script has various steering options (see below).
+It spawns multuiple processes, each process processing a unique Enstore volume.
+
+
 Requirements
 ------------
 
-Script works both with python2 and python3 and requires ``psycopg2`` module be installed (using ``pip`` or ``yum install python-psycopg2``).
+
+The scrit works both with python2 and python3 and requires ``psycopg2`` module be installed (using ``pip`` or ``yum install python-psycopg2``).
 
 
 Invocation
