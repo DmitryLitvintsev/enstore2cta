@@ -7,7 +7,7 @@ enstore2cta script
 .. toctree::
    :maxdepth: 1
 
-   enstore2cta_scipt.rst
+   enstore2cta_script.rst
 
 Configuration
 =============
