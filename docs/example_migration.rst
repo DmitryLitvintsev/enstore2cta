@@ -125,3 +125,22 @@ On db end::
  ----------------
   91 GB
  (1 row)
+
+
+Minor limitation
+----------------
+
+During migration the value of comment in ``tape.user_comment`` is assigned the value ``"Migrated from Enstore: "+volume.comment``. The width of ``tape.user_comment`` is 1000 characters. Some of the comments on Enstore volumes exceed
+``1000 - len("Migrated from Enstore: ")``::
+
+ enstoredb=# select count(*), storage_group from volume
+             where character_length(comment) > 1000-23
+             group by storage_group order by count(*) desc;
+  count | storage_group
+ -------+---------------
+     50 | nova
+      1 | cms
+ (2 rows)
+
+
+This is solved by simply truncating coment string to 1000 before inserting.
