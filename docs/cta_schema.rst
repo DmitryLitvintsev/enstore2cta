@@ -6,7 +6,7 @@ Here is CTA schema:
 .. image:: images/cta.relationships.real.compact.png
 
 Unlike Enstore schema, the CTA db schema is more normalized and specifically
-separates out the concepts of logical libraries, virtual organization, storage class into corresponding table. Therefore the names of ``virtual_organization``, ``logical_library`` and  ``storage_class`` have to be defined by admin in advance before any file can be written.
+separates out the concepts of logical libraries, virtual organization, storage class into corresponding tables. Therefore, the names of ``virtual_organization``, ``logical_library`` and  ``storage_class`` have to be defined by admin in advance before any file can be written.
 
 Additonally CTA has a concept of ``tape_pool`` that represents logical grouping
 of tapes. Each tape belongs to exactly one tape pool. Tape pools are used to keep data belonging to different VOs, storage_class (via ``archive_route``).
