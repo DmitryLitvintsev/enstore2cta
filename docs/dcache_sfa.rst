@@ -3,11 +3,11 @@ SFA files
 
 One of the issues that has been identified - CTA does not have
 functinality corresponding to Enstore SFA (Small File Aggregation).
-In the nutsheed SFA system is and extension of Enstore system that
-managed intermediate disk storage in the side (intermediate between
+In the nutshel the SFA system is as extension of Enstore system that
+manages  intermediate disk storage on the side (intermediate between
 dCache and Enstore). Depending on policies based on ``file_family``,
-``storage_group``, ``library`` and file sizd Enstore directs files
-to the intermediate storage for subsequent perioding packaging - tarring
+``storage_group``, ``library`` and file size Enstore directs files
+to the intermediate storage for subsequent periodic packaging - tarring
 the small files into large package files that then are written to
 tape more efficiently.
 
