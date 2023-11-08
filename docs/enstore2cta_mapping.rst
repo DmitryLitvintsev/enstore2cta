@@ -23,6 +23,9 @@ Enstore to CTA mapping
    * - ``file.bfid``
      - ``archive_file.archive_file_id``
      - Sequence in CTA
+   * - ``file.pnfs_id``
+     - ``archive_file.disk_file_id``
+     -
    * - | if bfid has entry in
        | ``file_copies_map``
      - | ``storage_class.nb_copies``
