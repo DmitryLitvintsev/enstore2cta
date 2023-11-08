@@ -94,6 +94,7 @@ Public
 ------
 
 ::
+
  nohup  python enstore2cta.py --all  > public.log 2>&1&
 
 Above command does "everything" including inserting locations to chimera db.
