@@ -18,7 +18,7 @@ import time
 sys.path.insert(0, os.path.abspath('../../enstore2cta'))
 
 # -- Project information -----------------------------------------------------
-from decisionengine.framework.about import __version__, __title__, __author__  # noqa
+from enstore2cta.about import __version__, __title__, __author__  # noqa
 
 project = __title__
 copyright = '{}, {}'.format(time.localtime().tm_year, __author__)
