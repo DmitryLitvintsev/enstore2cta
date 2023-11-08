@@ -19,7 +19,7 @@ Configuration
 
 
 Enstore Schema
-===============
+==============
 
 .. toctree::
    :maxdepth: 1
@@ -42,6 +42,15 @@ Enstore to CTA Mapping
    :maxdepth: 1
 
    enstore2cta_mapping.rst
+
+
+Example Migration
+================
+
+.. toctree::
+   :maxdepth: 1
+
+   example_migration.rst
 
 
 Source code
