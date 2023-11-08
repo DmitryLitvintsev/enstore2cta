@@ -45,4 +45,4 @@ Enstore does not have pre-defined ``library``, ``storage_group`` and ``file_fami
 File copies
 -----------
 
-If `encp` is passed comma separated list of libraries via directory tag or command line option Enstore will make as many copies of the file on volumes belonging to these libraries. In practice Fermilab Enstore system uses maximum 2 file copies for a subset of data. The relation between `primary` and `secondary` is captured in ``file_copies_map`` table having ``bfid`` and ``alt_bfid`` to express the relation.
+If `encp` is passed comma separated list of libraries via directory tag or command line option Enstore will make as many copies of the file on volumes belonging to these libraries. In practice Public Enstore system uses maximum 2 file copies for a subset of data. The relation between `primary` and `secondary` is captured in ``file_copies_map`` table having ``bfid`` and ``alt_bfid`` to express the relation.
