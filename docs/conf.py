@@ -18,11 +18,12 @@ import time
 sys.path.insert(0, os.path.abspath('../../enstore2cta'))
 
 # -- Project information -----------------------------------------------------
-from enstore2cta.about import __version__, __title__, __author__  # noqa
 
-project = __title__
-copyright = '{}, {}'.format(time.localtime().tm_year, __author__)
-author = __author__
+project = 'enstore2cta'
+copyright = 'Dmitry Litvintsev'
+author = 'Dmitry Litbintsev'
+release = '0.1.0'
+
 
 # The full version, including alpha/beta/rc tags
 release = __version__
