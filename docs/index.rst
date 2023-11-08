@@ -35,6 +35,14 @@ CTA Schema
 
    cta_schema.rst
 
+Enstore to CTA Mapping
+======================
+
+.. toctree::
+   :maxdepth: 1
+
+   enstore2cta_mapping.rst
+
 
 Source code
 ===========
