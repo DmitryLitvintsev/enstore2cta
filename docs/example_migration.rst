@@ -19,7 +19,7 @@ Result::
  2023-11-06 12:56:24 INFO : VR1871M8 Done, 2338 files
 
 "Took 0 seconds" because python3 does ``map(lambda x: x.join(), processes)``
-not the way I expected (fixed later). Took about 2 minutes!!
+not the way I expected (fixed later). Took about 15 minutes!!!. Identified several issues - storagdev201 was loaded, DB ifdb07.fnal.gov performing porly, destination chimera db running on ITB was very slow. Conclusion - we could not draw any performance numbers from this setup. But the script has been proven to work.
 
 Check that the file from that tape can be read by dCache::
 
