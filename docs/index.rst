@@ -48,7 +48,7 @@ Enstore to CTA Mapping
 
    enstore2cta_mapping.rst
 
-dCache locatons
+dCache locations
 ===============
 
 .. toctree::
