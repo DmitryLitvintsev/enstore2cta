@@ -32,4 +32,5 @@ Enstore to CTA mapping
        | ``file_copies_map``
      - | ``storage_class.nb_copies``
        | ``archive_route.copy_nb``
+       | And extra entries in ``tape_file``
      -
