@@ -1,6 +1,11 @@
 Welcome to Enstore to CTA documentation
 =======================================
 
+This document describes Enstore to CTA transition
+and software located in repository
+
+`https://github.com/DmitryLitvintsev/enstore2cta https://github.com/DmitryLitvintsev/enstore2cta`
+
 enstore2cta script
 ==================
 
