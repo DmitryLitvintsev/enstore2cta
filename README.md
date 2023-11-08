@@ -3,6 +3,12 @@
 enstore2cta - Enstore to CTA migration script
 =============================================
 
+Documentation
+-------------
+
+https://dmitrylitvintsev.github.io/enstore2cta/
+
+
 Requirements
 ------------
 
