@@ -51,7 +51,7 @@ The script ``enstore2cta.py`` running with ``--all`` options performs the follow
 5. for each vo creates ``tape_pool`` entry;
 6. for each storage class and corresponding tape_pool (by vo) creates ``archive_route`` entry;
 7. selects all Enstore volumes, that do not have ``"_copy_1"`` suffix and puts them on the Queue;
-8. spawns number of processes (default - number of cores) and feeds volume to them one at a time via Queue;
+8. spawns number of processes (default - number of cores), each process takes volume to process from Queue;
 9. each process:
   1. inserts volume into ``tape`` table;
   2. selects all active direct files, together with all their copies (if there are copies)
