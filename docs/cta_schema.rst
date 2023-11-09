@@ -17,7 +17,7 @@ File table
 ----------
 
 CTA separates the concept of `file` into an abstract ``archive_file`` that may
-have multiple corresponding ``tape_file`` entries. The ``archive_file`` table stores file size; adler32 checksum; dis instance name; ``disk_file_id`` - an inode number on storage front end; unique file id (``archive_file_id``); user UID/GID and a deleted flag.
+have multiple corresponding ``tape_file`` entries. The ``archive_file`` table stores file size; adler32 checksum; disk instance name; ``disk_file_id`` - an inode number on storage front end; unique file id (``archive_file_id``); user UID/GID and a deleted flag.
 
 A ``tape_file`` references ``archive_file`` and contains information that ties it to the tape - like volume id (``vid``); location on the tape and copy number.
 
