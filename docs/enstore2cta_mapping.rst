@@ -40,6 +40,7 @@ Enstore to CTA mapping
        | corresponding to file copy
 
 The script ``enstore2cta.py`` running with ``--all`` options performs the following steps:
+
 1. creates ``disk_instance`` with name corresponding to ``"disk_instance_name"``  key in configuration
    file ``enstore2cta.yaml``;
 2. selects distinct names of ``volume.storage_group`` -> creates entries in ``virtual_organization``;
