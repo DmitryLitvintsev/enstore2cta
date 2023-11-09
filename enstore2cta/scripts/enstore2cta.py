@@ -568,6 +568,10 @@ def insert_tape_pools(cta_db, vos):
     #
     tape_pools = {}
     for vo in vos:
+        #FIXME
+        # I think there has to be a tape pool for copies
+        # because we want copy to be in different physical
+        # location (library)
         res = insert_returning(cta_db,
                                INSERT_TAPE_POOL,
                                ("%s" % (vo,),
