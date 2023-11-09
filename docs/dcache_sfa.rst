@@ -12,7 +12,7 @@ the small files into large package files that then are written to
 tape more efficiently.
 
 The child/parent relation is captured in the same ``file`` table by
-setting child's ``file.package_id`` to be equal of BFID of the package file.
+setting child's ``file.package_id`` to be equal to BFID of the package file.
 
 To read SFA files in dCache/CTA setup this relation has to translate in
 chimera.
