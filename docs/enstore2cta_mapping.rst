@@ -14,7 +14,7 @@ Enstore to CTA mapping
      - ``virtual_organization_name``
      -
    * - | ``volume.storage_group``
-       |  ``volume.file_family``
+       | ``volume.file_family``
      - ``storage_class.storage_class_name=volume.storage_group+"."+volume.file_family+"@cta"``
      - | This is needed so that dCache can
        | communicate to CTA and still use ``storage_class``
@@ -33,4 +33,8 @@ Enstore to CTA mapping
      - | ``storage_class.nb_copies``
        | ``archive_route.copy_nb``
        | And extra entries in ``tape_file``
-     -
+     - | The ``storage_class.nb_copies`` is set to 2
+       | if ``volume.file_family ~ '.*_copy_1'``
+       | and or each enry in ``file_copies_map``
+       | an extra entry is made in ``file_copies_map``
+       | corresponding to file copy
