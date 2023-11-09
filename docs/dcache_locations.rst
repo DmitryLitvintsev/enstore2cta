@@ -1,5 +1,5 @@
-dCache location
-===============
+dCache fie location
+===================
 
 dCache needs to know location of files in CTA. It is done by utilizing URI location style and looks like::
 

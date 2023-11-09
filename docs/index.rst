@@ -48,8 +48,8 @@ Enstore to CTA Mapping
 
    enstore2cta_mapping.rst
 
-dCache locations
-===============
+dCache file locations
+=====================
 
 .. toctree::
    :maxdepth: 1
