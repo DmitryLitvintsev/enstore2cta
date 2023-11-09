@@ -21,7 +21,7 @@ There is a solution for it, used by similar to SFA, SAPPHIRE system by dCache.
 We need to translate::
 
  child_pnfsid, package_pnfsid ->
-    -> dcache://dcache/?store=vo&group=file_family&bfid={child_pnfsid}:package_pnfsid
+    -> dcache://dcache/?store=vo&group=file_family&bfid=child_pnfsid:package_pnfsid
 
 I.e. the child/package relation exists as location in ``t_locationinfo`` Chimera
 table. As long as these locations exist dCache can read these files from CTA using an hsm script. T.e. SAPPHIRE system is not need for reading of SFA files.
