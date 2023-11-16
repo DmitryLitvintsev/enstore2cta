@@ -143,7 +143,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and media_type in ('LTO8', 'M8', 'LTO9')
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 SELECT_LIBRARIES_FOR_VO = """
@@ -176,7 +176,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 SELECT_MULTIPLE_COPY_STORAGE_CLASSES = """
@@ -187,7 +187,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 
@@ -197,7 +197,7 @@ select distinct storage_group from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 #
@@ -212,7 +212,7 @@ select label from volume
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
         and active_files > 0
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
         order by label asc
 """
 
