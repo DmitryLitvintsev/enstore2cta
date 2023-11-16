@@ -143,16 +143,28 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and media_type in ('LTO8', 'M8', 'LTO9')
+        and storage_group != 'cms'
 """
 
 SELECT_LIBRARIES_FOR_VO = """
-select distinct library as library
+select distinct storage_group, library, file_family
 from volume
   where active_files>0
         and system_inhibit_0 = 'none'
         and library not like 'shelf%%'
         and media_type in ('LTO8', 'M8', 'LTO9')
+--        and file_family not like '%%-MIGRATION%%'
         and storage_group = %s
+"""
+
+SELECT_LIBRARIES_FOR_ALL_VOS = """
+select distinct storage_group, library, file_family
+from volume
+  where active_files>0
+        and system_inhibit_0 = 'none'
+        and library not like 'shelf%%'
+        and media_type in ('LTO8', 'M8', 'LTO9')
+--        and file_family not like '%%-MIGRATION%%'
 """
 
 
@@ -164,8 +176,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and file_family not like '%-MIGRATION'
-        and file_family not like '%-MIGRATION2'
+        and storage_group != 'cms'
 """
 
 SELECT_MULTIPLE_COPY_STORAGE_CLASSES = """
@@ -176,8 +187,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family like '%_copy_1'
-        and file_family not like '%-MIGRATION_copy_1'
-        and file_family not like '%-MIGRATION2_copy_1'
+        and storage_group != 'cms'
 """
 
 
@@ -187,8 +197,7 @@ select distinct storage_group from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and file_family not like '%-MIGRATION'
-        and file_family not like '%-MIGRATION2'
+        and storage_group != 'cms'
 """
 
 #
@@ -202,9 +211,8 @@ select label from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and file_family not like '%-MIGRATION'
-        and file_family not like '%-MIGRATION2'
         and active_files > 0
+        and storage_group != 'cms'
         order by label asc
 """
 
@@ -562,30 +570,27 @@ insert into tape_pool (
   null)
 """
 
-def insert_tape_pools(cta_db, vos):
-    #
-    # select all libraries for VO
-    #
-    tape_pools = {}
-    for vo in vos:
-        #FIXME
-        # I think there has to be a tape pool for copies
-        # because we want copy to be in different physical
-        # location (library)
-        res = insert_returning(cta_db,
-                               INSERT_TAPE_POOL,
-                               ("%s" % (vo,),
-                                vo,
-                                0,
-                                "Tape pool for %s" % (vo,),
-                                getpass.getuser(),
-                                HOSTNAME,
-                                int(time.time()),
-                                getpass.getuser(),
-                                HOSTNAME,
-                                int(time.time())))
-        tape_pools[vo] = res
-    return tape_pools
+def insert_tape_pools(cta_db, storage_classes):
+    for storage_class, number_of_copies in storage_classes.items():
+        vo, file_family = storage_class.split(".")
+        for i in range(number_of_copies):
+            pool = "Pool for %s copy %s" % (vo, str(i+1),)
+            try:
+                res = insert_returning(cta_db,
+                                       INSERT_TAPE_POOL,
+                                       (pool,
+                                        "%s" % (vo,),
+                                        0,
+                                        pool,
+                                        getpass.getuser(),
+                                        HOSTNAME,
+                                        int(time.time()),
+                                        getpass.getuser(),
+                                        HOSTNAME,
+                                        int(time.time())))
+            except psycopg2.IntegrityError:
+                pass
+
 
 INSERT_ARCHIVE_ROUTE = """
 insert into archive_route (
@@ -602,7 +607,7 @@ insert into archive_route (
 ) values (
   (select storage_class_id from storage_class where storage_class_name = %s),
   %s,
-  %s,
+  (select tape_pool_id from tape_pool where tape_pool_name = %s),
   %s,
   %s,
   %s,
@@ -613,23 +618,30 @@ insert into archive_route (
 )
 """
 
-def insert_archive_routes(cta_db, storage_classes, tape_pools):
+def insert_archive_routes(cta_db,
+                          storage_classes):
+
     for storage_class, number_of_copies in storage_classes.items():
-        vo = storage_class.split(".")[0]
-        pool = tape_pools[vo]
-        res = insert(cta_db,
-                     INSERT_ARCHIVE_ROUTE,
-                     (storage_class + "@cta",
-                      number_of_copies,
-                      pool["tape_pool_id"],
-                      "Archive route for %s, tape pool %s" % (storage_class + "@cta",
-                                                              pool["tape_pool_name"],),
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time()),
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time())))
+        vo, file_family = storage_class.split(".")
+        for i in range(number_of_copies):
+            pool = "Pool for %s copy %s" % (vo, str(i+1),)
+            try:
+                res = insert(cta_db,
+                             INSERT_ARCHIVE_ROUTE,
+                             (storage_class + "@cta",
+                              i+1,
+                              pool,
+                              "Archive route for tape pool %s, %s" % (storage_class, str(i+1),),
+                              getpass.getuser(),
+                              HOSTNAME,
+                              int(time.time()),
+                              getpass.getuser(),
+                              HOSTNAME,
+                              int(time.time())))
+            except Exception as e:
+                print_message("Failed to insert archive_route for %s %s" %
+                              (storage_class, str(e)))
+                pass
 
 
 INSERT_ARCHIVE_FILE = """
@@ -791,20 +803,24 @@ insert into tape (
 
 def insert_cta_tape(connection, enstore_volume, config):
     vo = enstore_volume["storage_group"]
-    library = enstore_volume["library"]
-    tape_pool_name = "%s:%s" % (library, vo,) #FIXME
     logical_library_name = enstore_volume["library"]
+    file_family =  enstore_volume["file_family"]
+    tape_pool_name = "Pool for %s copy 1" % (vo,)
+    if file_family.endswith("_copy_1"):
+        tape_pool_name = "Pool for %s copy 2" % (vo,)
+
     if config.get("library_map"):
         try:
             logical_library_name = config.get("library_map")[logical_library_name]
         except KeyError:
             raise
+
     res = insert(connection,
                  INSERT_CTA_TAPE,(
                      enstore_volume["label"][:6],
                      config.get("media_type_map")[enstore_volume["media_type"]],
                      logical_library_name,
-                     config.get("tape_pool_name",enstore_volume["storage_group"]),  #FIXME
+                     config.get("tape_pool_name", tape_pool_name),
                      enstore_volume["active_bytes"],
                      extract_file_number(enstore_volume["eod_cookie"]) - 1,
                      enstore_volume["active_files"],
@@ -891,6 +907,21 @@ def update_cta_copy_counts(cta_db):
     return res
 
 
+def get_library_map(enstore_db):
+    res = select(enstore_db,
+                 SELECT_LIBRARIES_FOR_ALL_VOS)
+    vos = {}
+    for row in res:
+        vo = row["storage_group"]
+        if vo not in vos:
+            vos[vo] = []
+        vos[vo].append({
+            "library" : row["library"],
+            "file_family"  : row["file_family"]
+        })
+    return vos
+
+
 class Worker(multiprocessing.Process):
     """
     Class that processed individual enstore volume
@@ -925,9 +956,10 @@ class Worker(multiprocessing.Process):
                 except KeyError:
                     print_error("Failed to insert tape label %s because mapping for libary %s does not exist" % (enstore_volume["label"], enstore_volume["library"],))
                     continue
-                except Exception as e:
-                    print_error("%s already exist, skipping, %s " %
-                                (enstore_volume["label"], str(e)))
+                except psycopg2.IntegrityError:
+                   # except psycopg2.IntegrityError as e:
+                   # print_error("%s already exist, skipping, %s " %
+                   #             (enstore_volume["label"], str(e)))
                     continue
                 files = select(enstore_db,
                                SELECT_ENSTORE_FILES_FOR_VOLUME_WITH_COPY,
@@ -952,10 +984,7 @@ class Worker(multiprocessing.Process):
                                     print_message("%s added label containing "
                                                   "copies  %s" % (label,
                                                                   copy_label,))
-                                except Exception as e:
-                                    print_error("%s volume %s already exists, "
-                                                "skipping %s" %
-                                                (label, f["label"], str(e)))
+                                except psycopg2.IntegrityError:
                                     pass
                             try:
                                 if f["copy_deleted"] == "n":
@@ -985,9 +1014,10 @@ class Worker(multiprocessing.Process):
                                             (label, f["pnfs_id"], location, str(e),))
                                 pass
 
-                    except Exception as e:
-                        print_error("%s, multiple pnfsid, skipping %s, %s" %
-                                    (enstore_volume["label"], f["pnfs_id"], str(e)))
+                    except psycopg2.IntegrityError:
+                    #except Exception as e:
+                        print_error("%s, failed to insert archive_file, multiple pnfsid, skipping %s" %
+                                    (enstore_volume["label"], f["pnfs_id"], ))
                         continue
                 print_message("%s Done, %d files" %(label, len(files),))
         except Exception as e:
@@ -1225,7 +1255,7 @@ def main():
         sys.exit(1)
 
     configuration["skip_locations"] = args.skip_locations
-    #print (configuration)
+    print (configuration)
 
     if args.label and args.all:
         parser.print_help(sys.stderr)
@@ -1256,7 +1286,6 @@ def main():
         print_error("Failed to initialize connection to chimera_db, quitting")
         sys.exit(1)
 
-
     if args.add:
         if args.storage_class and args.vo:
             cta_db = create_connection(configuration.get("cta_db"))
@@ -1286,15 +1315,18 @@ def main():
             insert_cta_media_types(cta_db)
         except:
             pass
-        insert_disk_instance(cta_db, disk_instance_name=configuration.get("disk_instance_name"))
-        vos = insert_vos(enstore_db, cta_db, disk_instance_name=configuration.get("disk_instance_name"))
+        insert_disk_instance(cta_db,
+                             disk_instance_name=configuration.get("disk_instance_name"))
+        vos = insert_vos(enstore_db,
+                         cta_db,
+                         disk_instance_name=configuration.get("disk_instance_name"))
         libraries = insert_logical_libraries(enstore_db, cta_db)
         storage_classes = insert_storage_classes(enstore_db, cta_db)
-        tape_pools = insert_tape_pools(cta_db, vos)
-        insert_archive_routes(cta_db, storage_classes, tape_pools)
+        insert_tape_pools(cta_db, storage_classes)
+        insert_archive_routes(cta_db,
+                              storage_classes)
         enstore_db.close()
         cta_db.close()
-
 
     print_message("**** Start processing %d  labels ****" % (len(labels), ))
     t0 = time.time()
