@@ -777,7 +777,7 @@ insert into tape (
            %s,
            0,
            0,
-           '2',
+           %s,
            'Enstore',
            %s,
            '',
@@ -801,6 +801,8 @@ insert into tape (
    )
 """
 
+# label_format is just before 'Enstore' above
+
 def insert_cta_tape(connection, enstore_volume, config):
     vo = enstore_volume["storage_group"]
     logical_library_name = enstore_volume["library"]
@@ -815,6 +817,10 @@ def insert_cta_tape(connection, enstore_volume, config):
         except KeyError:
             raise
 
+    label_format = None
+    if enstore_volume["wrapper"] == "cpio_odc":
+        label_format = "2"
+
     res = insert(connection,
                  INSERT_CTA_TAPE,(
                      enstore_volume["label"][:6],
@@ -827,6 +833,7 @@ def insert_cta_tape(connection, enstore_volume, config):
                      enstore_volume["active_bytes"],
                      enstore_volume["active_files"],
                      enstore_volume["active_bytes"],
+                     label_format,
                      int(time.mktime(enstore_volume["declared"].timetuple())),
                      int(time.mktime(enstore_volume["last_access"].timetuple())),
                      int(time.mktime(enstore_volume["last_access"].timetuple())),
