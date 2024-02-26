@@ -817,9 +817,9 @@ def insert_cta_tape(connection, enstore_volume, config):
         except KeyError:
             raise
 
-    label_format = None
-    if enstore_volume["wrapper"] == "cpio_odc":
-        label_format = "2"
+    label_format = "2"
+    if enstore_volume["wrapper"] == "cern":
+        label_format = "0"
 
     res = insert(connection,
                  INSERT_CTA_TAPE,(
