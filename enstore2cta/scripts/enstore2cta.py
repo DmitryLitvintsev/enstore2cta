@@ -143,7 +143,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and media_type in ('LTO8', 'M8', 'LTO9')
---        and storage_group != 'cms'
+        and storage_group != 'cms'
 """
 
 SELECT_LIBRARIES_FOR_VO = """
@@ -176,7 +176,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
---        and storage_group != 'cms'
+        and storage_group != 'cms'
 """
 
 SELECT_MULTIPLE_COPY_STORAGE_CLASSES = """
@@ -187,7 +187,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family like '%_copy_1'
---        and storage_group != 'cms'
+        and storage_group != 'cms'
 """
 
 
@@ -197,7 +197,7 @@ select distinct storage_group from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
---        and storage_group != 'cms'
+        and storage_group != 'cms'
 """
 
 #
@@ -212,7 +212,7 @@ select label from volume
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
         and active_files > 0
---        and storage_group != 'cms'
+        and storage_group != 'cms'
         order by label asc
 """
 
@@ -573,15 +573,16 @@ insert into tape_pool (
 def insert_tape_pools(cta_db, storage_classes):
     for storage_class, number_of_copies in storage_classes.items():
         vo, file_family = storage_class.split(".")
+        user_comment = "Pool for %s" % (storage_class,)
+        tape_pool_name = storage_class
         for i in range(number_of_copies):
-            pool = "Pool for %s copy %s" % (vo, str(i+1),)
             try:
                 res = insert_returning(cta_db,
                                        INSERT_TAPE_POOL,
-                                       (pool,
+                                       (tape_pool_name,
                                         "%s" % (vo,),
                                         0,
-                                        pool,
+                                        user_comment,
                                         getpass.getuser(),
                                         HOSTNAME,
                                         int(time.time()),
@@ -590,6 +591,10 @@ def insert_tape_pools(cta_db, storage_classes):
                                         int(time.time())))
             except psycopg2.IntegrityError:
                 pass
+            finally:
+                user_comment = "Pool for %s copy %s" % (storage_class, str(i+1),)
+                tape_pool_name = "%s_copy_%s" % (storage_class, str(i+1),)
+
 
 
 INSERT_ARCHIVE_ROUTE = """
@@ -623,14 +628,14 @@ def insert_archive_routes(cta_db,
 
     for storage_class, number_of_copies in storage_classes.items():
         vo, file_family = storage_class.split(".")
+        tape_pool_name = storage_class
         for i in range(number_of_copies):
-            pool = "Pool for %s copy %s" % (vo, str(i+1),)
             try:
                 res = insert(cta_db,
                              INSERT_ARCHIVE_ROUTE,
                              (storage_class + "@cta",
                               i+1,
-                              pool,
+                              tape_pool_name,
                               "Archive route for tape pool %s, %s" % (storage_class, str(i+1),),
                               getpass.getuser(),
                               HOSTNAME,
@@ -642,6 +647,9 @@ def insert_archive_routes(cta_db,
                 print_message("Failed to insert archive_route for %s %s" %
                               (storage_class, str(e)))
                 pass
+            finally:
+                tape_pool_name = "%s_copy_%s" % (storage_class, str(i+1),)
+
 
 
 INSERT_ARCHIVE_FILE = """
@@ -807,9 +815,7 @@ def insert_cta_tape(connection, enstore_volume, config):
     vo = enstore_volume["storage_group"]
     logical_library_name = enstore_volume["library"]
     file_family =  enstore_volume["file_family"]
-    tape_pool_name = "Pool for %s copy 1" % (vo,)
-    if file_family.endswith("_copy_1"):
-        tape_pool_name = "Pool for %s copy 2" % (vo,)
+    tape_pool_name = "%s.%s" % (vo, file_family,)
 
     if config.get("library_map"):
         try:
