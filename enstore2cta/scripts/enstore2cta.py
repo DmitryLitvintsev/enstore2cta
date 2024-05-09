@@ -825,7 +825,7 @@ def insert_cta_tape(connection, enstore_volume, config):
 
     label_format = "2"
     if enstore_volume["wrapper"] == "cern":
-        label_format = "0"
+        label_format = "3"
 
     res = insert(connection,
                  INSERT_CTA_TAPE,(
