@@ -143,7 +143,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and media_type in ('LTO8', 'M8', 'LTO9')
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 SELECT_LIBRARIES_FOR_VO = """
@@ -176,7 +176,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 SELECT_MULTIPLE_COPY_STORAGE_CLASSES = """
@@ -187,7 +187,7 @@ from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 
@@ -197,7 +197,7 @@ select distinct storage_group from volume
         and system_inhibit_0 = 'none'
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
 """
 
 #
@@ -212,13 +212,15 @@ select label from volume
         and library not like 'shelf%'
         and file_family not like '%_copy_1'
         and active_files > 0
-        and storage_group != 'cms'
+--        and storage_group != 'cms'
         order by label asc
 """
 
 
 SELECT_ENSTORE_FILES_FOR_VOLUME = """
-select f.*, v.storage_group||'.'||v.file_family||'@cta' as storage_class
+select f.*,
+       v.storage_group||'.'||v.file_family||'@cta' as storage_class,
+       v.wrapper
 from file f inner join volume v
   on v.id = f.volume
   where
@@ -236,7 +238,8 @@ select f.*,
        f1.bfid as copy_bfid,
        f1.location_cookie as copy_location_cookie,
        f1.deleted as copy_deleted,
-       v1.*
+       v1.label,
+       v1.wrapper
 from file f
 inner join volume v on v.id = f.volume
 left outer join file_copies_map fcm on fcm.bfid = f.bfid
@@ -296,8 +299,57 @@ def print_message(text):
         sys.stdout.flush()
 
 
-def extract_file_number(location_cookie):
-    return int(location_cookie.split("_")[2])
+#def extract_file_number(location_cookie):
+#    return int(location_cookie.split("_")[2])
+
+
+def file_location_to_sequence(location):
+    return ( location - 2 ) / 3 + 1
+
+
+def extract_file_number(enstore_file):
+    """
+    enstore_file is a dictionary
+    expected to have location_cookie and wrapper fields
+    """
+    fseq = int(enstore_file["location_cookie"].split("_")[2])
+    if enstore_file["wrapper"] == "cern":
+        #
+        # when CERN wrapper is used the records look like
+        # HFT ("HeaderFileTrailer")
+        # Enstore stores actual location of the file as location_cookie
+        # CTA stores so called sequence number, which is
+        # the triplet number on a tape:
+        #
+        # Enstore location cookie:  2  5  8
+        #                          HFTHFTHFT
+        # CTA sequence number:      1  2  3
+        #
+        fseq = file_location_to_sequence(fseq)
+    return fseq
+
+
+def extract_eod(enstore_volume):
+    """
+    enstore_volume is a dictionary
+    expected to have wrapper end eod_cookie fields
+    """
+    eod = int(enstore_volume["eod_cookie"].split("_")[2]) - 1
+    if enstore_volume["wrapper"] == "cern":
+        #
+        # when CERN wrapper is used the records look like
+        # HFT ("HeaderFileTrailer")
+        # Enstore stores actual location of the file as location_cookie
+        # CTA stores so called sequence number, which is
+        # the triplet number on a tape:
+        #
+        # Enstore location cookie:  2  5  8
+        #                          HFTHFTHFT
+        # CTA sequence number:      1  2  3
+        #
+        eod = file_location_to_sequence(eod)
+    return eod
+
 
 # create DB connection from URI
 def create_connection(uri):
@@ -731,8 +783,8 @@ def insert_cta_file(connection, enstore_file, cta_label, config):
     res = insert(connection,
                  INSERT_TAPE_FILE, (
                      cta_label,
-                     extract_file_number(enstore_file["location_cookie"]),
-                     extract_file_number(enstore_file["location_cookie"]),
+                     extract_file_number(enstore_file),
+                     extract_file_number(enstore_file),
                      file_size,
                      1,
                      file_create_time,
@@ -748,8 +800,8 @@ def insert_cta_tape_file_copy(connection,
     res = insert(connection,
                  INSERT_TAPE_FILE, (
                      enstore_file["label"][:6],
-                     extract_file_number(enstore_file["copy_location_cookie"]),
-                     extract_file_number(enstore_file["copy_location_cookie"]),
+                     extract_file_number(enstore_file),
+                     extract_file_number(enstore_file),
                      enstore_file["size"],
                      2, # copy number
                      file_create_time,
@@ -834,7 +886,8 @@ def insert_cta_tape(connection, enstore_volume, config):
                      logical_library_name,
                      config.get("tape_pool_name", tape_pool_name),
                      enstore_volume["active_bytes"],
-                     extract_file_number(enstore_volume["eod_cookie"]) - 1,
+                     #extract_file_number(enstore_volume["eod_cookie"]) - 1,
+                     extract_eod(enstore_volume),
                      enstore_volume["active_files"],
                      enstore_volume["active_bytes"],
                      enstore_volume["active_files"],
