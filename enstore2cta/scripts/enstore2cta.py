@@ -454,16 +454,20 @@ insert into logical_library (
 def insert_logical_libraries(enstore_db, cta_db):
     enstore_libraries = get_enstore_libraries(enstore_db)
     for library in enstore_libraries:
-        res = insert(cta_db,
-                     INSERT_LOGICAL_LIBRARY,
-                     (library,
-                      "Imported from Enstore %s" % (library, ),
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time()),
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time())))
+        try:
+            res = insert(cta_db,
+                         INSERT_LOGICAL_LIBRARY,
+                         (library,
+                          "Imported from Enstore %s" % (library, ),
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time()),
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time())))
+        except psycopg2.IntegrityError:
+            print_message(f"Logical library {library} already exists")
+            pass
     return enstore_libraries
 
 
@@ -503,20 +507,24 @@ def insert_vos(enstore_db, cta_db, disk_instance_name):
                  SELECT_VOS)
     for row in vos:
         vo = row["storage_group"]
-        res = insert(cta_db,
-                     INSERT_VO,
-                     (vo,
-                      2, #FIXME read_max_drives
-                      2, #FIXME write_max_drives
-                      10*(1<<40), # 10 TB
-                      "Imported from Enstore",
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time()),
-                      getpass.getuser(),
-                      HOSTNAME,
-                      int(time.time()),
-                      disk_instance_name))
+        try:
+            res = insert(cta_db,
+                         INSERT_VO,
+                         (vo,
+                          2, #FIXME read_max_drives
+                          2, #FIXME write_max_drives
+                          10*(1<<40), # 10 TB
+                          "Imported from Enstore",
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time()),
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time()),
+                          disk_instance_name))
+        except psycopg2.IntegrityError:
+            print_message(f"VO {vo} already exists")
+            pass
     return [row["storage_group"] for row in vos]
 
 
@@ -549,18 +557,22 @@ insert into storage_class (
 """
 
 def insert_storage_class(cta_db, storage_class, vo, number_of_copies=1):
-    res = insert(cta_db,
-                 INSERT_STORAGE_CLASS,
-                 (storage_class+"@cta",
-                  number_of_copies,
-                  vo,
-                  "Imported from Enstore",
-                  getpass.getuser(),
-                  HOSTNAME,
-                  int(time.time()),
-                  getpass.getuser(),
-                  HOSTNAME,
-                  int(time.time())))
+    try:
+        res = insert(cta_db,
+                     INSERT_STORAGE_CLASS,
+                     (storage_class+"@cta",
+                      number_of_copies,
+                      vo,
+                      "Imported from Enstore",
+                      getpass.getuser(),
+                      HOSTNAME,
+                      int(time.time()),
+                      getpass.getuser(),
+                      HOSTNAME,
+                      int(time.time())))
+    except psycopg2.IntegrityError:
+        print_message(f"Storage class {storage_class} already exists")
+        pass
 
 
 def insert_storage_classes(enstore_db, cta_db):
@@ -1381,8 +1393,15 @@ def main():
             insert_cta_media_types(cta_db)
         except:
             pass
-        insert_disk_instance(cta_db,
-                             disk_instance_name=configuration.get("disk_instance_name"))
+
+        try:
+            insert_disk_instance(cta_db,
+                                 disk_instance_name=configuration.get("disk_instance_name"))
+        except psycopg2.IntegrityError as e:
+            print_message("Disk instrance {} aleady exists, not an error".
+                          format(configuration.get("disk_instance_name")))
+            pass
+
         vos = insert_vos(enstore_db,
                          cta_db,
                          disk_instance_name=configuration.get("disk_instance_name"))
