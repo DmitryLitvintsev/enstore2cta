@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example Migration &mdash; enstore2cta 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dCache setup with CTA" href="dcache_setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            enstore2cta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_script.html">enstore2cta - Enstore to CTA migration script</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_config.html">Configuration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore_schema.html">Enstore Schema</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cta_schema.html">CTA Schema</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_mapping.html">Enstore to CTA mapping</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_locations.html">dCache file location</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_sfa.html">SFA files</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_setup.html">dCache setup with CTA</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example Migration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#validation">Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#full-migration">Full migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cms">CMS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#public">Public</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minor-limitation">Minor limitation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">enstore2cta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Example Migration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/example_migration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-migration">
+<h1>Example Migration<a class="headerlink" href="#example-migration" title="Link to this heading"></a></h1>
+<section id="validation">
+<h2>Validation<a class="headerlink" href="#validation" title="Link to this heading"></a></h2>
+<p>On storagedev201, run the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">enstore2cta</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">label</span> <span class="n">VR1871M8</span> <span class="o">--</span><span class="n">add</span> <span class="o">&gt;</span> <span class="k">try</span><span class="o">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># tail try.log</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">01</span> <span class="n">INFO</span> <span class="p">:</span> <span class="o">****</span> <span class="n">Start</span> <span class="n">processing</span> <span class="mi">1</span>  <span class="n">labels</span> <span class="o">****</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">01</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Finished</span> <span class="n">file</span> <span class="n">migration</span><span class="p">,</span> <span class="n">bootstrapping</span> <span class="n">tapes</span> <span class="n">copies</span> <span class="n">counts</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">02</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Doing</span> <span class="n">label</span> <span class="n">VR1871M8</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">02</span> <span class="n">INFO</span> <span class="p">:</span> <span class="o">****</span> <span class="n">FINISH</span> <span class="o">****</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">02</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Took</span> <span class="mi">0</span> <span class="n">seconds</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">06</span> <span class="mi">12</span><span class="p">:</span><span class="mi">56</span><span class="p">:</span><span class="mi">24</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VR1871M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">2338</span> <span class="n">files</span>
+</pre></div>
+</div>
+<p>“Took 0 seconds” because python3 does <code class="docutils literal notranslate"><span class="pre">map(lambda</span> <span class="pre">x:</span> <span class="pre">x.join(),</span> <span class="pre">processes)</span></code>
+not the way I expected (fixed later). Took about 15 minutes!!!. Identified several issues - storagdev201 was loaded, DB ifdb07 performing poorly, destination chimera db running on ITB was very slow. Conclusion - we could not draw any performance numbers from this setup. But the script has been proven to work.</p>
+<p>Check that the file from that tape can be read by dCache:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fndcaitb3</span><span class="p">]</span> <span class="p">(</span><span class="n">rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="nd">@rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="n">Domain</span><span class="p">)</span> <span class="n">enstore</span> <span class="o">&gt;</span>  <span class="n">rh</span> <span class="n">restore</span> <span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span>
+<span class="n">Fetch</span> <span class="n">request</span> <span class="n">queued</span><span class="o">.</span>
+<span class="p">[</span><span class="n">fndcaitb3</span><span class="p">]</span> <span class="p">(</span><span class="n">rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="nd">@rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="n">Domain</span><span class="p">)</span> <span class="n">enstore</span> <span class="o">&gt;</span> <span class="n">rep</span> <span class="n">ls</span>  <span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span>
+<span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span> <span class="o">&lt;---</span><span class="n">S</span><span class="o">-------</span><span class="n">L</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span> <span class="mi">0</span> <span class="n">si</span><span class="o">=</span><span class="p">{</span><span class="n">ssa_test</span><span class="o">.</span><span class="n">diskSF1T_in_LTO8G1T</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Observed CTA reading volume <code class="docutils literal notranslate"><span class="pre">VR1871</span></code>, and after a while:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fndcaitb3</span><span class="p">]</span> <span class="p">(</span><span class="n">rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="nd">@rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="n">Domain</span><span class="p">)</span> <span class="n">enstore</span> <span class="o">&gt;</span> <span class="n">rep</span> <span class="n">ls</span>  <span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span>
+<span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span> <span class="o">&lt;</span><span class="n">C</span><span class="o">-------</span><span class="n">X</span><span class="o">--</span><span class="n">L</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span> <span class="mi">2097152000</span> <span class="n">si</span><span class="o">=</span><span class="p">{</span><span class="n">ssa_test</span><span class="o">.</span><span class="n">diskSF1T_in_LTO8G1T</span><span class="p">}</span>
+
+<span class="p">[</span><span class="n">fndcaitb3</span><span class="p">]</span> <span class="p">(</span><span class="n">rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="nd">@rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="n">Domain</span><span class="p">)</span> <span class="n">enstore</span> <span class="o">&gt;</span> <span class="n">pf</span> <span class="mi">000003042</span><span class="n">F3D23AF47BFB08A496A256A861C</span>
+<span class="o">/</span><span class="n">pnfs</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">ssa_test</span><span class="o">/</span><span class="n">CTA</span><span class="o">/</span><span class="n">large</span><span class="o">/</span><span class="mi">7</span><span class="o">/</span><span class="n">dc0796f8</span><span class="o">-</span><span class="mi">3</span><span class="n">b21</span><span class="o">-</span><span class="mi">400</span><span class="n">b</span><span class="o">-</span><span class="mi">8</span><span class="n">d9f</span><span class="o">-</span><span class="n">c066a80aca5c</span><span class="o">.</span><span class="n">data</span>
+<span class="p">[</span><span class="n">fndcaitb3</span><span class="p">]</span> <span class="p">(</span><span class="n">rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="nd">@rw</span><span class="o">-</span><span class="n">stkendca28a</span><span class="o">-</span><span class="mi">1</span><span class="n">Domain</span><span class="p">)</span> <span class="n">enstore</span> <span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>File was staged and marked cached on pool.</p>
+</section>
+<section id="full-migration">
+<h2>Full migration<a class="headerlink" href="#full-migration" title="Link to this heading"></a></h2>
+<p>Used fdm1903, 8 TB NVME drive. 24 cores.</p>
+<ol class="arabic simple">
+<li><p>use <cite>pg_basebackup</cite> to bring over chimera db from production</p></li>
+<li><p>created CTA database from schema DDL</p></li>
+<li><p>used production enstoredb as a source</p></li>
+</ol>
+</section>
+<section id="cms">
+<h2>CMS<a class="headerlink" href="#cms" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nohup</span>  <span class="n">python</span> <span class="n">enstore2cta_cms</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="nb">all</span> <span class="o">--</span><span class="n">skip_locations</span> <span class="o">&gt;</span> <span class="n">cms</span><span class="o">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span><span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--skip_locations</span></code> was used because I did not have CMS chimera carried over.</p>
+<p>Result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># tail cms.log</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">36</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA931M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3115</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">36</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA930M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3159</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA932M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3145</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA934M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3338</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA936M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3253</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA937M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3185</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA938M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">3195</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">37</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Finished</span> <span class="n">file</span> <span class="n">migration</span><span class="p">,</span> <span class="n">bootstrapping</span> <span class="n">tapes</span> <span class="n">copies</span> <span class="n">counts</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">44</span> <span class="n">INFO</span> <span class="p">:</span> <span class="o">****</span> <span class="n">FINISH</span> <span class="o">****</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">23</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">44</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Took</span> <span class="mi">2210</span> <span class="n">seconds</span>
+</pre></div>
+</div>
+<p>On db end:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cta_cms</span><span class="o">=</span><span class="c1"># select pg_size_pretty(pg_database_size(&#39;cta_cms&#39;));</span>
+<span class="n">pg_size_pretty</span>
+<span class="o">----------------</span>
+<span class="mi">16</span> <span class="n">GB</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+
+
+<span class="n">cta_cms</span><span class="o">=</span><span class="c1"># select count(*) from archive_file;</span>
+  <span class="n">count</span>
+<span class="o">----------</span>
+ <span class="mi">28193693</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="public">
+<h2>Public<a class="headerlink" href="#public" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nohup</span>  <span class="n">python</span> <span class="n">enstore2cta</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="nb">all</span>  <span class="o">&gt;</span> <span class="n">public</span><span class="o">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span><span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>Above command does “everything” including inserting locations to chimera db.
+Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># tail public.log</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">48</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA788M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">14591</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">49</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA771M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">20641</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">53</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA768M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">24322</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">53</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA784M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">21471</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">05</span><span class="p">:</span><span class="mi">01</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA734M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">44020</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">05</span><span class="p">:</span><span class="mi">56</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA752M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">68899</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">03</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">VRA785M8</span> <span class="n">Done</span><span class="p">,</span> <span class="mi">66068</span> <span class="n">files</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">03</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Finished</span> <span class="n">file</span> <span class="n">migration</span><span class="p">,</span> <span class="n">bootstrapping</span> <span class="n">tapes</span> <span class="n">copies</span> <span class="n">counts</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">14</span> <span class="n">INFO</span> <span class="p">:</span> <span class="o">****</span> <span class="n">FINISH</span> <span class="o">****</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">14</span> <span class="n">INFO</span> <span class="p">:</span> <span class="n">Took</span> <span class="mi">17813</span> <span class="n">seconds</span>
+</pre></div>
+</div>
+<p>On db end:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cta_dev</span><span class="o">=</span><span class="c1"># select count(*) from archive_file;</span>
+   <span class="n">count</span>
+<span class="o">-----------</span>
+ <span class="mi">151757273</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+
+<span class="n">cta_dev</span><span class="o">=</span><span class="c1"># select pg_size_pretty(pg_database_size(&#39;cta_dev&#39;));</span>
+ <span class="n">pg_size_pretty</span>
+<span class="o">----------------</span>
+ <span class="mi">91</span> <span class="n">GB</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="minor-limitation">
+<h2>Minor limitation<a class="headerlink" href="#minor-limitation" title="Link to this heading"></a></h2>
+<p>During migration the value of comment in <code class="docutils literal notranslate"><span class="pre">tape.user_comment</span></code> is assigned the value <code class="docutils literal notranslate"><span class="pre">&quot;Migrated</span> <span class="pre">from</span> <span class="pre">Enstore:</span> <span class="pre">&quot;+volume.comment</span></code>. The width of <code class="docutils literal notranslate"><span class="pre">tape.user_comment</span></code> is 1000 characters. Some of the comments on Enstore volumes exceed
+<code class="docutils literal notranslate"><span class="pre">1000</span> <span class="pre">-</span> <span class="pre">len(&quot;Migrated</span> <span class="pre">from</span> <span class="pre">Enstore:</span> <span class="pre">&quot;)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">enstoredb</span><span class="o">=</span><span class="c1"># select count(*), storage_group from volume</span>
+            <span class="n">where</span> <span class="n">character_length</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="o">-</span><span class="mi">23</span>
+            <span class="n">group</span> <span class="n">by</span> <span class="n">storage_group</span> <span class="n">order</span> <span class="n">by</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">desc</span><span class="p">;</span>
+ <span class="n">count</span> <span class="o">|</span> <span class="n">storage_group</span>
+<span class="o">-------+---------------</span>
+    <span class="mi">50</span> <span class="o">|</span> <span class="n">nova</span>
+     <span class="mi">1</span> <span class="o">|</span> <span class="n">cms</span>
+<span class="p">(</span><span class="mi">2</span> <span class="n">rows</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is solved by simply truncating comment string to 1000 before inserting.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dcache_setup.html" class="btn btn-neutral float-left" title="dCache setup with CTA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Dmitry Litvintsev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
