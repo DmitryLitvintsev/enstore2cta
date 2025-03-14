@@ -451,8 +451,11 @@ insert into logical_library (
 """
 
 
-def insert_logical_libraries(enstore_db, cta_db):
-    enstore_libraries = get_enstore_libraries(enstore_db)
+def insert_logical_libraries_old(enstore_db, cta_db):
+    #
+    # create logical libraries in CTA mamed the same Enstore libraries
+    #
+    logical_libraries = enstore_libraries = get_enstore_libraries(enstore_db)
     for library in enstore_libraries:
         try:
             res = insert(cta_db,
@@ -469,6 +472,26 @@ def insert_logical_libraries(enstore_db, cta_db):
             print_message(f"Logical library {library} already exists")
             pass
     return enstore_libraries
+
+
+def insert_logical_libraries(cta_db, config):
+    logical_libraries = set(config.get("library_map").values())
+    for library in logical_libraries:
+        try:
+            res = insert(cta_db,
+                         INSERT_LOGICAL_LIBRARY,
+                         (library,
+                          "Imported from Enstore %s" % (library, ),
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time()),
+                          getpass.getuser(),
+                          HOSTNAME,
+                          int(time.time())))
+        except psycopg2.IntegrityError:
+            print_message(f"Logical library {library} already exists")
+            pass
+    return logical_libraries
 
 
 INSERT_VO = """
@@ -1405,7 +1428,8 @@ def main():
         vos = insert_vos(enstore_db,
                          cta_db,
                          disk_instance_name=configuration.get("disk_instance_name"))
-        libraries = insert_logical_libraries(enstore_db, cta_db)
+        #libraries = insert_logical_libraries_old(enstore_db, cta_db)
+        libraries = insert_logical_libraries(cta_db, configuration)
         storage_classes = insert_storage_classes(enstore_db, cta_db)
         insert_tape_pools(cta_db, storage_classes)
         insert_archive_routes(cta_db,
