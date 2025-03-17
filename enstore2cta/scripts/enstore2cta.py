@@ -238,8 +238,7 @@ select f.*,
        f1.bfid as copy_bfid,
        f1.location_cookie as copy_location_cookie,
        f1.deleted as copy_deleted,
-       v1.label,
-       v1.wrapper
+       v1.*
 from file f
 inner join volume v on v.id = f.volume
 left outer join file_copies_map fcm on fcm.bfid = f.bfid
@@ -1058,9 +1057,10 @@ class Worker(multiprocessing.Process):
                     print_error("Failed to insert tape label %s because mapping for libary %s does not exist" % (enstore_volume["label"], enstore_volume["library"],))
                     continue
                 except psycopg2.IntegrityError:
-                   # except psycopg2.IntegrityError as e:
-                   # print_error("%s already exist, skipping, %s " %
-                   #             (enstore_volume["label"], str(e)))
+                    # except psycopg2.IntegrityError as e:
+                    # print_error("%s already exist, skipping, %s " %
+                    #             (enstore_volume["label"], str(e)))
+                    print_error(f"{label} Done, aleady exists, skipping")
                     continue
                 files = select(enstore_db,
                                SELECT_ENSTORE_FILES_FOR_VOLUME_WITH_COPY,
