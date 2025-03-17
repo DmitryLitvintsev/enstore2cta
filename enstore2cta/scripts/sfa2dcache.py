@@ -271,7 +271,8 @@ class SfaWorker(multiprocessing.Process):
                             0,
                             10,
                             1,
-                            f"dcache://dcache/?store={enstore_storage_group}&group={chimera_file_family}&bfid={child_pnfsid}:{pnfsid}"
+                            #f"dcache://dcache/?store={enstore_storage_group}&group={chimera_file_family}&bfid={child_pnfsid}:{pnfsid}"
+                            f"sfa://sfa/{child_pnfsid}?packageid={pnfsid}"
                            ))
                 except psycopg2.errors.NotNullViolation:
                     #print_error(f"file {pnfsid} child {child_pnfsid} does not exist")
