@@ -235,6 +235,7 @@ from file f inner join volume v
 SELECT_ENSTORE_FILES_FOR_VOLUME_WITH_COPY = """
 select f.*,
        v.storage_group||'.'||v.file_family||'@cta' as storage_class,
+       v.wrapper as original_wrapper,
        f1.bfid as copy_bfid,
        f1.location_cookie as copy_location_cookie,
        f1.deleted as copy_deleted,
@@ -830,7 +831,7 @@ def insert_cta_file(connection, enstore_file, cta_label, config):
                                 ))
     archive_file_id = int(cta_file["archive_file_id"])
     location_cookie = enstore_file["location_cookie"]
-    wrapper = enstore_file["wrapper"]
+    wrapper = enstore_file["original_wrapper"]
     fseq = extract_file_number(location_cookie, wrapper)
     res = insert(connection,
                  INSERT_TAPE_FILE, (
