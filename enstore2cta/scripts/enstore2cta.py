@@ -264,6 +264,7 @@ media_type_map = {
 
 printLock = multiprocessing.Lock()
 
+
 def print_error(text):
     """
     Print text string to stderr prefixed with timestamp
@@ -298,21 +299,35 @@ def print_message(text):
         sys.stdout.flush()
 
 
-#def extract_file_number(location_cookie):
-#    return int(location_cookie.split("_")[2])
-
-
 def file_location_to_sequence(location):
     return ( location - 2 ) / 3 + 1
 
 
-def extract_file_number(enstore_file):
+def extract_file_number_old(enstore_file):
     """
     enstore_file is a dictionary
     expected to have location_cookie and wrapper fields
     """
     fseq = int(enstore_file["location_cookie"].split("_")[2])
     if enstore_file["wrapper"] == "cern":
+        #
+        # when CERN wrapper is used the records look like
+        # HFT ("HeaderFileTrailer")
+        # Enstore stores actual location of the file as location_cookie
+        # CTA stores so called sequence number, which is
+        # the triplet number on a tape:
+        #
+        # Enstore location cookie:  2  5  8
+        #                          HFTHFTHFT
+        # CTA sequence number:      1  2  3
+        #
+        fseq = file_location_to_sequence(fseq)
+    return fseq
+
+
+def extract_file_number(location_cookie, wrapper):
+    fseq = int(location_cookie.split("_")[2])
+    if wrapper == "cern":
         #
         # when CERN wrapper is used the records look like
         # HFT ("HeaderFileTrailer")
@@ -814,11 +829,14 @@ def insert_cta_file(connection, enstore_file, cta_label, config):
                                     '0'
                                 ))
     archive_file_id = int(cta_file["archive_file_id"])
+    location_cookie = enstore_file["location_cookie"]
+    wrapper = enstore_file["wrapper"]
+    fseq = extract_file_number(location_cookie, wrapper)
     res = insert(connection,
                  INSERT_TAPE_FILE, (
                      cta_label,
-                     extract_file_number(enstore_file),
-                     extract_file_number(enstore_file),
+                     fseq,
+                     fseq,
                      file_size,
                      1,
                      file_create_time,
@@ -830,12 +848,15 @@ def insert_cta_tape_file_copy(connection,
                               enstore_file,
                               config):
     file_create_time = int(enstore_file["copy_bfid"][4:14])
+    location_cookie = enstore_file["copy_location_cookie"]
+    wrapper = enstore_file["wrapper"]
+    fseq = extract_file_number(location_cookie, wrapper)
 
     res = insert(connection,
                  INSERT_TAPE_FILE, (
                      enstore_file["label"][:6],
-                     extract_file_number(enstore_file),
-                     extract_file_number(enstore_file),
+                     fseq,
+                     fseq,
                      enstore_file["size"],
                      2, # copy number
                      file_create_time,
