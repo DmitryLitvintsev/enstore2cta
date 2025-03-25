@@ -1054,6 +1054,7 @@ class Worker(multiprocessing.Process):
         self.config = config
 
     def run(self):
+        enstore_db, cta_db, chimera_db = None, None, None
         try:
             # enstore db
             enstore_db = create_connection(self.config.get("enstore_db"))
