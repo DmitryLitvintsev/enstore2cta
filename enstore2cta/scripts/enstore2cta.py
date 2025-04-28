@@ -30,6 +30,8 @@ if not CONFIG_FILE:
 
 HOSTNAME = socket.getfqdn()
 
+STOPPER="/tmp/STOP"
+
 CTA_MEDIA_TYPES = { "LTO8" : { "media_type_name" : "LTO8",
                                "cartridge" : "LTO-8",
                                "capacity_in_bytes" : 12000000000000,
@@ -1065,6 +1067,9 @@ class Worker(multiprocessing.Process):
 
             added_copy_volumes = set()
             for label in iter(self.queue.get, None):
+                if os.path.exists(STOPPER):
+                    print_error(f"Found {STOPPER} file. Quitting...")
+                    break
                 cta_label = label[:6]
                 print_message("Doing label %s" % (label, ))
                 enstore_volumes = select(enstore_db,
@@ -1312,6 +1317,10 @@ def get_enstore_libraries(enstore_db):
 
 def main():
 
+    if os.path.exists(STOPPER):
+        print_error(f"Found {STOPPER} file. Quitting...")
+        sys.exit(1)
+
     """
     main function
     """
@@ -1481,6 +1490,10 @@ def main():
 
     for worker in workers:
         worker.join()
+
+    if os.path.exists(STOPPER):
+        print_error(f"Found {STOPPER} file. Quitting...")
+        sys.exit(1)
 
     print_message("Finished file migration, bootstrapping tapes copies counts")
 
