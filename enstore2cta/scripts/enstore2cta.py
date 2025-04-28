@@ -623,7 +623,8 @@ def insert_storage_classes(enstore_db, cta_db):
     number_of_copies = 2
     for row in multiple_copy_storge_classes:
         storage_class = row["storage_class"]
-        storage_class = storage_class.rstrip("_copy_1")
+        #storage_class = storage_class.rstrip("_copy_1")
+        storage_class = storage_class[:-7] # len("_copy_1") = 7
         vo = storage_class.split(".")[0]
         insert_storage_class(cta_db, storage_class, vo, number_of_copies)
         added_classes[storage_class] = number_of_copies
@@ -747,6 +748,11 @@ def insert_archive_routes(cta_db,
                               getpass.getuser(),
                               HOSTNAME,
                               int(time.time())))
+
+            except psycopg2.IntegrityError:
+                print_message(f"Archive route for {storage_class} already exists")
+                pass
+
             except Exception as e:
                 print_message("Failed to insert archive_route for %s %s" %
                               (storage_class, str(e)))
