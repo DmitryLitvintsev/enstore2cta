@@ -1,0 +1,4 @@
+# DB connection parameters,
+# cta_db and chimera_db require r/w access
+enstore_db: "postgresql://enstore_reader:password@localhost:8888/enstoredb"
+chimera_db: "postgresql://enstore:password@localhost:5432/chimera"

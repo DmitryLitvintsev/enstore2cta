@@ -413,9 +413,9 @@ def main():
 #        parser.print_help(sys.stderr)
 #        sys.exit(1)
 
-    if not os.path.exists(PNFS_HOME):
-        print_error("PNFS is not mounted. Quitting.")
-        sys.exit(1)
+#    if not os.path.exists(PNFS_HOME):
+#        print_error("PNFS is not mounted. Quitting.")
+#        sys.exit(1)
 
 #    if not os.path.exists(args.dir):
 #        print_error("Directry %s does not exist. Quitting.")
