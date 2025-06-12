@@ -260,9 +260,9 @@ class SfaWorker(multiprocessing.Process):
             pnfsids = [x["pnfs_id"] for x in enstore_children]
 
             for child_pnfsid in pnfsids:
-                insert(chimera_db,
-                       DELETE_LOCATION,
-                       (child_pnfsid,))
+#                insert(chimera_db,
+#                       DELETE_LOCATION,
+#                       (child_pnfsid,))
 
                 try:
                     insert(chimera_db,
@@ -276,6 +276,9 @@ class SfaWorker(multiprocessing.Process):
                            ))
                 except psycopg2.errors.NotNullViolation:
                     #print_error(f"file {pnfsid} child {child_pnfsid} does not exist")
+                    pass
+                except psycopg2.errors.UniqueViolation:
+                    print_message(f"file  {pnfsid} child {child_pnfsid} location already exists")
                     pass
 
         enstore_db.close()

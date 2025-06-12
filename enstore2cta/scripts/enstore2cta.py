@@ -824,12 +824,24 @@ def insert_cta_file(connection, enstore_file, cta_label, config):
     if file_create_time < get_switch_epoch() and HOSTNAME.endswith(".fnal.gov"):
         file_crc =  convert_0_adler32_to_1_adler32(file_crc, file_size)
 
+    # CTA does not allow to write UID=0 (root owned) files
+    # Files in Enstore may be owned by root
+    # When re-packing tapes, UID=0 becomes an issue
+    # To avoid that, change UID (and GID) to 1
+    # NB: when dCache writes files to CTA, it passes 1:1
+    # as UID:GID because UID:GID is not available to cta-driver
+    # this may change in the future
+
+    uid = enstore_file["uid"] if enstore_file["uid"] > 0 else 1
+    gid = enstore_file["gid"] if enstore_file["gid"] > 0 else 1
+
+
     cta_file = insert_returning(connection,
                                 INSERT_ARCHIVE_FILE,(
                                     config.get("disk_instance_name"),
                                     enstore_file["pnfs_id"],
-                                    enstore_file["uid"],
-                                    enstore_file["gid"],
+                                    uid,
+                                    gid,
                                     file_size,
                                     file_crc,
                                     enstore_file["storage_class"],
