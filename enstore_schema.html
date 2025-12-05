@@ -1,0 +1,170 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enstore Schema &mdash; enstore2cta 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CTA Schema" href="cta_schema.html" />
+    <link rel="prev" title="Configuration" href="enstore2cta_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            enstore2cta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_script.html">enstore2cta - Enstore to CTA migration script</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_config.html">Configuration</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Enstore Schema</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-table">File table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#volume-table">Volume table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-copies">File copies</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cta_schema.html">CTA Schema</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_mapping.html">Enstore to CTA mapping</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_locations.html">dCache file location</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_sfa.html">SFA files</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_setup.html">dCache setup with CTA</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_migration.html">Example Migration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">enstore2cta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Enstore Schema</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/enstore_schema.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="enstore-schema">
+<h1>Enstore Schema<a class="headerlink" href="#enstore-schema" title="Link to this heading"></a></h1>
+<p>Here is Enstore DB schema that does not contain “unattached”
+tables like <code class="docutils literal notranslate"><span class="pre">media_capacity</span></code>:</p>
+<img alt="_images/enstoredb.relationships.real.compact.png" src="_images/enstoredb.relationships.real.compact.png" />
+<p>There are two main tables - <code class="docutils literal notranslate"><span class="pre">file</span></code> and <code class="docutils literal notranslate"><span class="pre">volume</span></code> and a bunch of ancillary
+tables of which only <code class="docutils literal notranslate"><span class="pre">file_copies_map</span></code> is important for Enstore -&gt; CTA transition. This table maps <cite>primary</cite> file copy and secondary file copies. In reality
+Enstore uses maximum one extra copy of a file. Not all files have extra copies.</p>
+<section id="file-table">
+<h2>File table<a class="headerlink" href="#file-table" title="Link to this heading"></a></h2>
+<p>Each file copy in Enstore is uniquely identified by a BFID  -  bit file id,
+which is a string obtained by adding a three letter <cite>brand</cite> (which is the same for all files in a given Enstore instance), the Unix epoch, multiplied by 100000 and a counter which is reserved to resolve collisions. BFID is generated in the code base and is inserted into <code class="docutils literal notranslate"><span class="pre">file</span></code> table where it has unique constraint. If insert fails, the counter is incremented and the record insertion is tried again. And so on until it succeeds.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bfid</span> <span class="o">=</span> <span class="s2">&quot;CDMS&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">*</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Each file record contains PNFSID (dCache inode identifier) that ties it back to
+the front end storage system; adler32 checksum; a reference to the file package for small files in SFA (Small File Aggregation) equal BFID of the package or <code class="docutils literal notranslate"><span class="pre">null</span></code> for <cite>direct</cite> files; file size; original file name;  UID/GID of user who created the file; tape location and a <code class="docutils literal notranslate"><span class="pre">deleted</span></code> flag that indicates whether or not the file
+has been removed from namespace.</p>
+</section>
+<section id="volume-table">
+<h2>Volume table<a class="headerlink" href="#volume-table" title="Link to this heading"></a></h2>
+<p>Every tape in Enstore is stored in the <code class="docutils literal notranslate"><span class="pre">volume</span></code> table.
+The many to one <code class="docutils literal notranslate"><span class="pre">file</span></code> to <code class="docutils literal notranslate"><span class="pre">volume</span></code> relation is done on integer <code class="docutils literal notranslate"><span class="pre">volume.id</span></code> primary key via <code class="docutils literal notranslate"><span class="pre">file.volume</span></code> foreign key.</p>
+<p>Each volume record tracks how many active/deleted/total files and bytes exist
+on the volume (via DB trigger on insert/update/delete). It has a volume label; total/remaining bytes; number of mounts; number of read and write accesses; several status fields that allow to classify tapes (e.g. <code class="docutils literal notranslate"><span class="pre">full</span></code>, <code class="docutils literal notranslate"><span class="pre">NOACCESS</span></code>, <code class="docutils literal notranslate"><span class="pre">NOTALLOWED</span></code>, <code class="docutils literal notranslate"><span class="pre">migrated</span></code>, <code class="docutils literal notranslate"><span class="pre">migrating</span></code>). The values of status fields are arbitrary strings.</p>
+<p>The Enstore system  has a concept of virtual library, so called library manager (LM). The LM
+manages a set of movers that have SCSI tape drives attached. LM (and movers) are Enstore servers and are configured based in Enstore instance configuration and are not captured in database schema. Each LM has a unique name and draws specific tapes allocated for it. This relation is captured in <code class="docutils literal notranslate"><span class="pre">volume.library</span></code> field.</p>
+<p>Since Enstore LMs map  to actual  physical tape libraries, the volumes have to be pre-allocated to specific LMs.</p>
+<p>Accounting and data steering aspects of Enstore operations use <code class="docutils literal notranslate"><span class="pre">volume.storage_group</span></code> field (usually corresponding to a VO name); <code class="docutils literal notranslate"><span class="pre">volume.file_family</span></code> a string field that tells Enstore to use the same set of tapes to write data having this attribute. <code class="docutils literal notranslate"><span class="pre">volume.file_family_width</span></code> an integer that specified how many tape drives can be used simultaneously to write data with specific <code class="docutils literal notranslate"><span class="pre">file_family</span></code>.</p>
+<p>Enstore does not have pre-defined <code class="docutils literal notranslate"><span class="pre">library</span></code>, <code class="docutils literal notranslate"><span class="pre">storage_group</span></code> and <code class="docutils literal notranslate"><span class="pre">file_family</span></code> concepts. When files are written to  Enstore it receives the instruction of what (<code class="docutils literal notranslate"><span class="pre">library</span></code>, <code class="docutils literal notranslate"><span class="pre">file_family</span></code>, <code class="docutils literal notranslate"><span class="pre">file_family_width</span></code>) to use from Enstore command line client <code class="docutils literal notranslate"><span class="pre">encp</span></code>. When invoked, the <code class="docutils literal notranslate"><span class="pre">encp</span></code> client takes these parameters from directory tags of the destination directory or they can be passed as options to encp. File family value can be completely arbitrary and user defined. Specifying random <code class="docutils literal notranslate"><span class="pre">library</span></code> string results in failure to write if Enstore does not actually have a running LM with matching name.</p>
+</section>
+<section id="file-copies">
+<h2>File copies<a class="headerlink" href="#file-copies" title="Link to this heading"></a></h2>
+<p>If <cite>encp</cite> is passed comma separated list of libraries via directory tag or command line option Enstore will make as many copies of the file on volumes belonging to these libraries. In practice Public Enstore system uses maximum 2 file copies for a subset of data. The relation between <cite>primary</cite> and <cite>secondary</cite> is captured in <code class="docutils literal notranslate"><span class="pre">file_copies_map</span></code> table having <code class="docutils literal notranslate"><span class="pre">bfid</span></code> and <code class="docutils literal notranslate"><span class="pre">alt_bfid</span></code> to express the relation.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="enstore2cta_config.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cta_schema.html" class="btn btn-neutral float-right" title="CTA Schema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Dmitry Litvintsev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SFA files &mdash; enstore2cta 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dCache setup with CTA" href="dcache_setup.html" />
+    <link rel="prev" title="dCache file location" href="dcache_locations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            enstore2cta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_script.html">enstore2cta - Enstore to CTA migration script</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_config.html">Configuration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore_schema.html">Enstore Schema</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cta_schema.html">CTA Schema</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="enstore2cta_mapping.html">Enstore to CTA mapping</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_locations.html">dCache file location</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SFA files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#invocation">Invocation</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dcache_setup.html">dCache setup with CTA</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example_migration.html">Example Migration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">enstore2cta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SFA files</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dcache_sfa.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sfa-files">
+<h1>SFA files<a class="headerlink" href="#sfa-files" title="Link to this heading"></a></h1>
+<p>One of the issues that has been identified - CTA does not have
+functionality corresponding to Enstore SFA (Small File Aggregation).
+In the nutshell the SFA system is as extension of Enstore system that
+manages  intermediate disk storage on the side (intermediate between
+dCache and Enstore). Depending on policies based on <code class="docutils literal notranslate"><span class="pre">file_family</span></code>,
+<code class="docutils literal notranslate"><span class="pre">storage_group</span></code>, <code class="docutils literal notranslate"><span class="pre">library</span></code> and file size Enstore directs files
+to the intermediate storage for subsequent periodic packaging - tarring
+the small files into large package files that then are written to
+tape more efficiently.</p>
+<p>The child/parent relation is captured in the same <code class="docutils literal notranslate"><span class="pre">file</span></code> table by
+setting child’s <code class="docutils literal notranslate"><span class="pre">file.package_id</span></code> to be equal to BFID of the package file.</p>
+<p>To read SFA files in dCache/CTA setup this relation has to translate in
+chimera.</p>
+<p>There is a solution for it, used by similar to SFA, SAPPHIRE system by dCache.
+We need to translate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>child_pnfsid, package_pnfsid -&gt;
+   -&gt; dcache://dcache/?store=&lt;vo&gt;&amp;group=&lt;file_family&gt;&amp;bfid=&lt;child_pnfsid&gt;:&lt;package_pnfsid&gt;
+</pre></div>
+</div>
+<p>I.e. the child/package relation exists as location in <code class="docutils literal notranslate"><span class="pre">t_locationinfo</span></code> Chimera
+table. As long as these locations exist dCache can read these files from CTA using an hsm script. T.e. SAPPHIRE system is not need for reading of SFA files.</p>
+<p>This can be populated out of band.</p>
+<p>After some iterations, the final SFA location is expressed as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sfa://sfa/&lt;child_pnfsid&gt;?packageid=&lt;parent_pnfsid&gt;
+</pre></div>
+</div>
+<p>The script sfa2dcache.py, located in enstore2cta/scripts,
+implements SFA metadata migration from Enstore DB to dCache DB.</p>
+<section id="invocation">
+<h2>Invocation<a class="headerlink" href="#invocation" title="Link to this heading"></a></h2>
+<p>To run the scripqt a config file <code class="docutils literal notranslate"><span class="pre">enstore2cta.yaml</span></code> <em>must</em> exist in
+the current directory or be pointed at by <code class="docutils literal notranslate"><span class="pre">MIGRATION_CONFIG</span></code> environment variable.
+Look for example in <code class="docutils literal notranslate"><span class="pre">enstore2cta/etc</span></code>. It must have “0600” permission (to protect database passwords if any).</p>
+<p>The configuration yaml must have connection parameters to enstoredb and chimeradb
+defined with the latter being write (insert, update) enabled.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#  python3 sfa2dcache.py  --help</span>
+<span class="n">usage</span><span class="p">:</span> <span class="n">sfa2dcache</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">dir</span> <span class="n">DIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cpu_count</span> <span class="n">CPU_COUNT</span><span class="p">]</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="nb">dir</span> <span class="n">DIR</span>             <span class="n">top</span> <span class="n">directory</span> <span class="n">name</span>
+  <span class="o">--</span><span class="n">cpu_count</span> <span class="n">CPU_COUNT</span>
+                        <span class="n">override</span> <span class="n">cpu</span> <span class="n">count</span> <span class="o">-</span> <span class="n">number</span> <span class="n">of</span> <span class="n">simultaneously</span> <span class="n">processed</span> <span class="n">labels</span>
+</pre></div>
+</div>
+<p>Where top directry name is the name of directory where Enstore stores package
+files (typically <cite>/pnfs/fs/usr/file_aggregation/</cite>)</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dcache_locations.html" class="btn btn-neutral float-left" title="dCache file location" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dcache_setup.html" class="btn btn-neutral float-right" title="dCache setup with CTA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Dmitry Litvintsev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
